@@ -9,8 +9,8 @@
         'clear': false,
         'clear-children': false,
         'title': 'Expander',
-        'title-card-margin': '0'
-        'title-card-background': 'transparent'
+        'title-card-margin': '0',
+        'title-card-background': 'transparent',
         'overlay-margin': '2em',
         'child-padding': '0.5em',
         'button-background': 'transparent'
@@ -19,7 +19,7 @@
 
 <!-- eslint-disable-next-line svelte/valid-compile -->
 <svelte:options customElement={{
-    tag: 'expander-card',
+    tag: 'expander-card-ultimate',
     extend: (customElementConstructor) => class extends customElementConstructor {
         // re-declare props used in customClass.
         public config!: ExpanderConfig;
@@ -32,7 +32,7 @@
         }
 
         public static getConfigElement() {
-            return document.createElement(`expander-card-editor${devMode ? '-dev' : ''}`);
+            return document.createElement(`expander-card-ultimate-editor${devMode ? '-dev' : ''}`);
         };
 
         public static getStubConfig(){
@@ -88,7 +88,7 @@
 </script>
 
 <ha-card
-    class={`expander-card ${config.clear ? 'clear' : ''}`}
+    class={`expander-card-ultimate ${config.clear ? 'clear' : ''}`}
     style="--padding:{config.padding}; --gap:{config.gap}; --title-card-margin:{config['title-card-margin']}; --ha-card-background:{config['title-card-background']};"
 >
     {#if config['title-card']}
@@ -160,7 +160,7 @@
 </ha-card>
 
 <style>
-    .expander-card {
+    .expander-card-ultimate {
         display: grid;
         padding: var(--padding);
         grid-template-rows: 0fr;

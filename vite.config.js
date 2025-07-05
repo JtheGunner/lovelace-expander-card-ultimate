@@ -11,7 +11,7 @@ export default defineConfig({
             replacements: process.env.DEV ? [
                 {
                     from: '"expander-card-ultimate-editor"',
-                    to: '"expander-card-editor-ultimate-dev"'
+                    to: '"expander-card-ultimate-editor-dev"'
                 },
                 {
                     from: '"expander-card-ultimate"',
