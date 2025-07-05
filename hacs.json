@@ -1,6 +1,6 @@
 {
-    "name": "expander-card",
+    "name": "expander-card-ultimate",
     "content_in_root": false,
     "render_readme": true,
-    "filename": "lovelace-expander-card.js"
+    "filename": "lovelace-expander-card-ultimate.js"
 }

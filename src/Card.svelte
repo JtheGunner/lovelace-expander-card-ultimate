@@ -13,7 +13,7 @@ limitations under the License.
 */
 -->
 <!-- eslint-disable-next-line svelte/valid-compile -->
-<svelte:options  customElement='expander-sub-card' />
+<svelte:options  customElement='expander-sub-card-ultimate' />
 
 <script lang="ts">
     import type { LovelaceCard, HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';

@@ -33,9 +33,9 @@ const devMode = import.meta.env.MODE === 'dev';
 window.customCards = window.customCards || [];
 window.customCards.push(...[
     {
-        type: `expander-card${devMode ? '-dev' : ''}`,
-        name: `Expander Card${devMode ? '-dev' : ''}`,
+        type: `expander-card-ultimate${devMode ? '-dev' : ''}`,
+        name: `Expander Card Ultimate${devMode ? '-dev' : ''}`,
         preview: true,
-        description: `Expander Card${devMode ? ' Dev' : ''}`
+        description: `Expander Card Ultimate${devMode ? ' Dev' : ''}`
     }
 ]);

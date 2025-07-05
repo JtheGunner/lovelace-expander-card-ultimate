@@ -10,16 +10,16 @@ export default defineConfig({
         replaceCodePlugin({
             replacements: process.env.DEV ? [
                 {
-                    from: '"expander-card-editor"',
-                    to: '"expander-card-editor-dev"'
+                    from: '"expander-card-ultimate-editor"',
+                    to: '"expander-card-editor-ultimate-dev"'
                 },
                 {
-                    from: '"expander-card"',
-                    to: '"expander-card-dev"'
+                    from: '"expander-card-ultimate"',
+                    to: '"expander-card-ultimate-dev"'
                 },
                 {
-                    from: '"expander-sub-card"',
-                    to: '"expander-sub-card-dev"'
+                    from: '"expander-sub-card-ultimate"',
+                    to: '"expander-sub-card-ultimate-dev"'
                 }
             ] : [
             ],
@@ -29,7 +29,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: 'src/index.ts',
-            name: 'lovelace-expander-card.js',
+            name: 'lovelace-expander-card-ultimate.js',
         }
     }
 });
