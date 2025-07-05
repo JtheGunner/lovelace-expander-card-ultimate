@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"types": ["svelte"],
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+        "module": "esnext",
+        "lib": ["es2019", "dom"],
+        "moduleResolution": "bundler"
+	},
+    "include": ["src/**/*"],
+}
