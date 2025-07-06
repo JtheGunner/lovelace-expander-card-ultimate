@@ -21,6 +21,7 @@ export interface ExpanderConfig {
     'title': string;
     'title-card-style-target': string;
     'title-card-custom-styles': string;
+    'title-card-default-styles': string;
     'title-card-margin'?: string;
     'title-card-background'?: string;
     'title-card'?: LovelaceCardConfig;

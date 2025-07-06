@@ -32,9 +32,9 @@ limitations under the License.
         hass,
         clearChild = false,
         isTitleCard = false,
-        styleTarget = '',
-        styles = '',
-    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean; isTitleCard: boolean; styleTarget: string; styles: string } = $props();
+        customStyles = '',
+        defaultStyles = '',
+    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean; isTitleCard: boolean; customStyles: string; defaultStyles: string } = $props();
 
     let container = $state<LovelaceCard>();
     let loading = $state(true);
@@ -46,43 +46,7 @@ limitations under the License.
     });
 
 
-    // $effect(() => {
-    //     if (container) {
-    //         container.hass = hass;
-    //     }
-    //
-    //     if (isTitleCard && styleTarget !== '' && styles !== '') {
-    //         let stylesArray = parseStylesFromStringToObject(styles);
-    //         console.log(stylesArray);
-    //
-    //         // setTimeout(() => {
-    //         let element: any = container;
-    //         let maxLoops = 20;
-    //
-    //         while (maxLoops > 0) {
-    //             console.log(element);
-    //             if (element.querySelector(styleTarget)) {
-    //                 console.log('MATCH', element);
-    //                 console.log(createCssRules(stylesArray));
-    //                 element.prepend(createShadowStyle(createCssRules(stylesArray)));
-    //                 break;
-    //             }
-    //
-    //             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-    //             console.log('nextObject', nextObject);
-    //
-    //             if (nextObject === null) {
-    //                 console.log('no valid child found to append styles');
-    //                 break;
-    //             }
-    //
-    //             element = nextObject;
-    //             maxLoops--;
-    //         }
-    //         // }, 100);
-    //
-    //     }
-    // });
+
 
     onMount(async () => {
         console.log('SUB-CARD MOUNTED:', new Date().toLocaleTimeString());
@@ -98,18 +62,24 @@ limitations under the License.
         container.replaceWith(el);
         container = el;
         if (clearChild) {
-            el.shadowRoot?.appendChild(createShadowStyle(`
+
+        }
+
+        el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
                     background-color: transparent !important;
                     border-style: none !important;
                 }
             `));
-        }
 
-        if (isTitleCard && styleTarget && styles) {
+        let styles = trimPipe(trimPipe(customStyles)+'|'+trimPipe(defaultStyles));
+        console.log(styles);
+        return;
+
+        if (isTitleCard && styles) {
             let element = el;
             console.log('element', element)
-            await applyTitleCardStyles(element, styleTarget, styles);
+            await applyTitleCardStyles(element, styles);
         }
 
         loading = false;
@@ -118,6 +88,10 @@ limitations under the License.
     onDestroy(() => {
         console.log('SUB-CARD DESTROYED:', new Date().toLocaleTimeString());
     });
+
+    function trimPipe(str: string): string{
+        return str.replace(/^\|+|\|+$/g, '');
+    }
 
     /**
      * Asynchronously waits for an element to exist in the DOM.

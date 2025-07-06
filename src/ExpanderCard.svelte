@@ -8,8 +8,8 @@
         'clear': false,
         'clear-children': false,
         'title': 'Expander',
-        'title-card-style-target': '',
         'title-card-custom-styles': '',
+        'title-card-default-styles': '',
         'title-card-margin': '0',
         'title-card-background': 'var(--card-background-color, #fff)',
         'overlay-margin': '2em',
@@ -103,8 +103,8 @@
                         type={config['title-card'].type}
                         clearChild={config['clear-children'] || false}
                         isTitleCard={true}
-                        styleTarget={config['title-card-style-target']}
-                        styles={config['title-card-custom-styles']}/>
+                        customStyles={config['title-card-custom-styles']}
+                        defaultStyles={config['title-card-custom-styles']}/>
             </div>
             <button
                     aria-label="Toggle"
