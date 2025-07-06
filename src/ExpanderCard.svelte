@@ -14,7 +14,9 @@
         'overlay-margin': '2em',
         'child-padding': '0.5em',
         'button-background': 'transparent',
-        'fontSizes': {}
+        'fontSizes': {
+            'h2': '16em'
+        }
     };
 </script>
 
@@ -69,21 +71,26 @@
             `;
     }).join(''));
 
+    console.log('dynamicStyleTmp111', dynamicStyleTmp);
+
     // add fields used in customClass as props.
     const {
         hass,
         self,
         config = defaults,
-        dynamicStyle = Object.entries(defaults.fontSizes).map(function ([selector, size]) {
+        dynamicStyle = dynamicStyleTmp
+    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
+
+    onMount(() => {
+        let dynamicStyleTmp = Object.entries(defaults.fontSizes).map(function ([selector, size]) {
             return `
             .title-card-container :global(${selector}) {
                 font-size: ${size} !important;
             }
             `;
-        }).join('')
-    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
+        }).join('');
 
-    onMount(() => {
+        console.log('dynamicStyleTmp', dynamicStyleTmp);
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;
         if (isEditorMode) {
             expanded = true;
