@@ -11,7 +11,7 @@
         'title-card-custom-styles': '',
         'title-card-default-styles': '',
         'title-card-margin': '0',
-        'title-card-background': 'var(--card-background-color, #fff)',
+        // 'title-card-background': 'var(--card-background-color, #fff)',
         'overlay-margin': '2em',
         'child-padding': '0.5em',
         'button-background': 'transparent'
