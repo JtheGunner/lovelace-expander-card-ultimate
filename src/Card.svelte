@@ -63,27 +63,30 @@ limitations under the License.
 
         }
 
-        await tick();
-
-        el.shadowRoot?.appendChild(createShadowStyle(`
+        await tick().then(async function(){
+            el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
                     background-color: transparent !important;
                     border-style: none !important;
                 }
             `));
 
-        let element = el;
-        let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
-        console.log('element', element);
-        console.log(customStyles);
-        console.log(defaultStyles);
-        console.log(styles);
 
-        if (isTitleCard && styles) {
-            await applyTitleCardStyles(element, styles);
-        }
+            let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
 
-        loading = false;
+            if (isTitleCard && styles) {
+                let element = el;
+
+                console.log('element', element);
+                console.log(customStyles);
+                console.log(defaultStyles);
+                console.log(styles);
+
+                await applyTitleCardStyles(element, styles);
+            }
+
+            loading = false;
+        });
     });
 
     onDestroy(() => {
