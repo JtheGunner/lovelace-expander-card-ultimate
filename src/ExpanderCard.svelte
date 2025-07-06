@@ -1,6 +1,5 @@
 <script lang="ts" module>
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    import Editor from './ExpanderCardEditor.svelte';
 
     const devMode = import.meta.env.MODE === 'dev';
     export const defaults = {
@@ -68,6 +67,10 @@
             :global(${selector}) {
                 font-size: ${size} !important;
             }
+
+            & :global(${selector}) {
+                font-size: ${size} !important;
+            }
             `;
     }).join(''));
 
@@ -101,6 +104,134 @@
         }
     });
 </script>
+
+<svelte:head>
+    {@html `<style>
+        .expander-card-ultimate {
+            display: grid;
+            padding: var(--padding);
+            grid-template-rows: 0fr;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .animation-wrapper {
+            display: grid;
+            overflow: hidden;
+            grid-template-rows: 0;
+            transition: grid-template-rows 0.5s ease-in-out;
+        }
+
+        .children-container {
+            padding: var(--child-padding);
+            display: grid;
+            gap: var(--gap);
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+
+            & > :global(:first-child) {
+                margin-top: var(--gap);
+            }
+        }
+
+        .clear {
+            background-color: transparent;
+            border-style: none;
+        }
+
+        .clear-children {
+            & :global(::slotted(ha-card)) {
+                background-color: transparent !important;
+                border-style: none !important;
+            }
+        }
+
+        :global(::slotted(ha-card)) {
+            background-color: transparent !important;
+            border-style: none !important;
+        }
+
+        .title-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row;
+        }
+
+        .title-card-header-overlay {
+            display: block;
+            padding: var(--title-card-margin);
+
+            & :global(h2) {
+                padding: 0;
+                margin: 0;
+                font-weight: 300 !important;
+              }
+            & :global(p) {
+                padding: 0;
+                margin: 0;
+              }
+
+              ${dynamicStyle}
+        }
+
+        .title-card-container {
+            width: 100%;
+            padding: var(--title-padding);
+
+            ${dynamicStyle}
+        }
+
+        .header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0.8em 0.8em;
+            margin: 2px;
+            background: var(--button-background);
+            border-style: none;
+        }
+
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: var(--overlay-margin);
+        }
+
+        .title {
+            width: 100%;
+            text-align: left;
+        }
+
+        .ico {
+            color: var(--primary-text-color);
+            transition-property: transform;
+            transition-duration: 0.35s;
+        }
+
+        .flipped {
+            transform: rotate(180deg);
+        }
+
+        .ripple {
+            background-position: center;
+            transition: background 0.8s;
+            border-radius: 1em;
+        }
+
+        .ripple:hover {
+            background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
+        }
+
+        .ripple:active {
+            background-color: #ffffff25;
+            background-size: 100%;
+            transition: background 0s;
+        }
+    </style>`
+    }
+</svelte:head>
+
 
 <ha-card
         class={`expander-card-ultimate ${config.clear ? 'clear' : ''}`}
@@ -173,126 +304,3 @@
         </div>
     {/if}
 </ha-card>
-
-{@html `<style>
-        .expander-card-ultimate {
-            display: grid;
-            padding: var(--padding);
-            grid-template-rows: 0fr;
-            transition: all 0.5s ease-in-out;
-        }
-
-        .animation-wrapper {
-            display: grid;
-            overflow: hidden;
-            grid-template-rows: 0;
-            transition: grid-template-rows 0.5s ease-in-out;
-        }
-
-        .children-container {
-            padding: var(--child-padding);
-            display: grid;
-            gap: var(--gap);
-            transition: all 0.3s ease-in-out;
-            overflow: hidden;
-
-            & > :global(:first-child) {
-                margin-top: var(--gap);
-            }
-        }
-
-        .clear {
-            background-color: transparent;
-            border-style: none;
-        }
-
-        .clear-children {
-            & :global(::slotted(ha-card)) {
-                background-color: transparent !important;
-                border-style: none !important;
-            }
-        }
-
-        :global(::slotted(ha-card)) {
-            background-color: transparent !important;
-            border-style: none !important;
-        }
-
-        .title-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-direction: row;
-        }
-
-        .title-card-header-overlay {
-            display: block;
-            padding: var(--title-card-margin);
-
-            & :global(h2) {
-                padding: 0;
-                margin: 0;
-                font-weight: 300 !important;
-              }
-            & :global(p) {
-                padding: 0;
-                margin: 0;
-              }
-        }
-
-        .title-card-container {
-            width: 100%;
-            padding: var(--title-padding);
-
-            ${dynamicStyle}
-        }
-
-        .header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 0.8em 0.8em;
-            margin: 2px;
-            background: var(--button-background);
-            border-style: none;
-        }
-
-        .header-overlay {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin: var(--overlay-margin);
-        }
-
-        .title {
-            width: 100%;
-            text-align: left;
-        }
-
-        .ico {
-            color: var(--primary-text-color);
-            transition-property: transform;
-            transition-duration: 0.35s;
-        }
-
-        .flipped {
-            transform: rotate(180deg);
-        }
-
-        .ripple {
-            background-position: center;
-            transition: background 0.8s;
-            border-radius: 1em;
-        }
-
-        .ripple:hover {
-            background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
-        }
-
-        .ripple:active {
-            background-color: #ffffff25;
-            background-size: 100%;
-            transition: background 0s;
-        }
-    </style>`
-}
