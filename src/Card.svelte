@@ -72,15 +72,14 @@ limitations under the License.
                 }
             `));
 
+        let element = el;
         let styles = trimPipe(trimPipe(customStyles)+';;'+trimPipe(defaultStyles));
+        console.log('element', element);
         console.log(customStyles);
         console.log(defaultStyles);
         console.log(styles);
-        return;
 
         if (isTitleCard && styles) {
-            let element = el;
-            console.log('element', element)
             await applyTitleCardStyles(element, styles);
         }
 
@@ -136,13 +135,16 @@ limitations under the License.
         });
     }
 
-    async function applyTitleCardStyles(cardElement: LovelaceCard, stylesString: string) {
+    async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
+        const parsedObjects = parseStyleString(styles);
+        console.log('parseStyleString', parseStyleString);
+        return;
         const targetElement = await waitForElement(cardElement, targetSelector);
         console.log('targetElement', targetElement);
         console.log('style element vorhanden', targetElement?.querySelector('style'))
 
         if (targetElement && targetElement.querySelector('style') === null) {
-            const cssRules = createCssRules(parseStylesFromStringToObject(stylesString));
+            const cssRules = createCssRules(parseStylesFromStringToObject(styles));
             console.log('cssRules', cssRules);
 
             if (cssRules) {
@@ -151,10 +153,90 @@ limitations under the License.
         }
     }
 
+
+
     function createShadowStyle(style: string): HTMLStyleElement {
         const shadowStyle = document.createElement('style');
         shadowStyle.innerHTML = style;
         return shadowStyle;
+    }
+
+    function getTargetSelectors(styles: string){
+        let split = styles.split(';;');
+        let data = {};
+
+        split.forEach(function (configString, index){
+            let split = styles.split(';;');
+        });
+
+    }
+
+    /**
+     * parse a separator based string to valid css config by their matching dom-targets
+     *
+     * Hierarchy of separators:
+     * 1. `;;` -> split the basic groups (domTarget + configs)
+     * 2. `:::` -> split domTargets from their configurations
+     * 3. `&&` -> split multiple selectors from the same domTarget
+     * 4. `||` -> split css-selectors from their style-configs
+     * 5. `,`  -> split multiple style declarations
+     * 6. `:`  -> split style key from value
+     *
+     * @param {string} inputString separator based string
+     * @returns {object} structured object to generate css
+     */
+    function parseStyleString(inputString: string) {
+        const finalStructure: any = {};
+
+        if (!inputString) {
+            return finalStructure;
+        }
+
+        const groups = inputString.split(';;');
+
+        for (const group of groups) {
+            if (!group) continue;
+
+            // 2. domTarget von der CSS-Konfiguration trennen
+            const [domTarget, cssConfig] = group.split(':::');
+            if (!domTarget || !cssConfig) continue;
+
+            // Initialisiere das Objekt für diesen domTarget, falls nicht vorhanden
+            finalStructure[domTarget] = finalStructure[domTarget] || {};
+
+            // 3. Mehrere Selektoren trennen
+            const selectorBlocks = cssConfig.split('&&');
+
+            for (const block of selectorBlocks) {
+                if (!block) continue;
+
+                // 4. Selektor von den Styles trennen
+                const [selector, stylesString] = block.split('||');
+                if (!selector || !stylesString) continue;
+
+                // 5. & 6. Styles parsen
+                const styles = stylesString
+                    .split(',')
+                    .map(stylePair => {
+                        if (!stylePair) return null;
+
+                        // Trennt Key und Value, auch wenn Value selbst ein ':' enthält
+                        const [key, ...valueParts] = stylePair.split(':');
+                        const value = valueParts.join(':');
+
+                        if (!key || value === undefined) return null;
+
+                        return { key: key.trim(), value: value.trim() };
+                    })
+                    .filter(Boolean); // remove potential null values
+
+                if (styles.length > 0) {
+                    finalStructure[domTarget][selector.trim()] = styles;
+                }
+            }
+        }
+
+        return finalStructure;
     }
 
     function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
@@ -165,17 +247,20 @@ limitations under the License.
 
         try {
             return Object.fromEntries(
-                stylesStr.split(',').map((part) => {
-                    const [selector, styles] = part.trim().split('=');
-                    if (!selector || !styles) throw new Error();
+                stylesStr.split(';;').map((part) => {
+                    const [domElement, styleConfig] = part.trim().split(':::');
+                    if (!domElement || !styleConfig) throw new Error();
 
-                    const styleArray = styles.split('|').map((stylePair) => {
+                    const [selector, style] = part.trim().split('||');
+                    if (!selector || !style) throw new Error();
+
+                    const styleArray = styleConfig.split('|').map((stylePair) => {
                         const [style, value] = stylePair.trim().split(':');
                         if (!style || !value) throw new Error();
                         return {style, value};
                     });
 
-                    return [selector, styleArray];
+                    return [domElement, styleArray];
                 })
             );
         } catch (e) {
