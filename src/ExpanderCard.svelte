@@ -65,7 +65,7 @@
 
     let dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes).map(function ([selector, size]) {
         return `
-            .title-card-container :global(${selector}) {
+            & :global(${selector}) {
                 font-size: ${size} !important;
             }
             `;
@@ -237,14 +237,24 @@
         .title-card-header-overlay {
             display: block;
             padding: var(--title-card-margin);
+
+            & :global(h2) {
+                padding: 0;
+                margin: 0;
+                font-weight: 300 !important;
+              }
+            & :global(p) {
+                padding: 0;
+                margin: 0;
+              }
         }
 
         .title-card-container {
             width: 100%;
             padding: var(--title-padding);
-        }
 
-        ${dynamicStyle}
+            ${dynamicStyle}
+        }
 
         .header {
             display: flex;
