@@ -75,9 +75,6 @@ limitations under the License.
         loading = false;
 
         if(isTitleCard && styleTarget !== '' && styles !== ''){
-
-            console.log(container, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
-
             let stylesArray = parseStylesFromStringToObject(styles);
             console.log(stylesArray);
 
@@ -105,7 +102,7 @@ limitations under the License.
                     element = nextObject;
                     maxLoops--;
                 }
-            }, 2000);
+            }, 100);
 
         }
     });
@@ -163,16 +160,14 @@ limitations under the License.
         return Object.entries(objects).map(function ([selector, styles]) {
             return `${selector} {
                 ${createCssStyles(styles)}
-            }
-            `;
-        }).join('').trim();
+            }`;
+        }).join("\n").trim();
     }
 
     function createCssStyles(stylesArray: Array<CssStyleObject>){
         return stylesArray.map(function (styleObject: CssStyleObject) {
-            return `${styleObject.style}: ${styleObject.value}
-            `;
-        }).join('').trim();
+            return `${styleObject.style}: ${styleObject.value};`;
+        }).join("\n").trim();
     }
 </script>
 
