@@ -72,7 +72,9 @@ limitations under the License.
                 }
             `));
 
-        let styles = trimPipe(trimPipe(customStyles)+'|'+trimPipe(defaultStyles));
+        let styles = trimPipe(trimPipe(customStyles)+';;'+trimPipe(defaultStyles));
+        console.log(customStyles);
+        console.log(defaultStyles);
         console.log(styles);
         return;
 
@@ -90,7 +92,7 @@ limitations under the License.
     });
 
     function trimPipe(str: string): string{
-        return str.replace(/^\|+|\|+$/g, '');
+        return str.replace(/^;+|;+$/g, '');
     }
 
     /**
