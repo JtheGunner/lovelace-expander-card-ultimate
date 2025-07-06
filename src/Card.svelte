@@ -13,13 +13,13 @@ limitations under the License.
 */
 -->
 <!-- eslint-disable-next-line svelte/valid-compile -->
-<svelte:options  customElement='expander-sub-card-ultimate' />
+<svelte:options customElement='expander-sub-card-ultimate'/>
 
 <script lang="ts">
-    import type { LovelaceCard, HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';
-    import { getCardUtil } from './cardUtil.svelte';
+    import type {HomeAssistant, LovelaceCard, LovelaceCardConfig} from 'custom-card-helpers';
+    import {getCardUtil} from './cardUtil.svelte';
     import {onMount} from 'svelte';
-    import { slide } from 'svelte/transition';
+    import {slide} from 'svelte/transition';
 
     type CssStyleObject = {
         style: string;
@@ -44,7 +44,7 @@ limitations under the License.
             container.hass = hass;
         }
 
-        if(isTitleCard && styleTarget !== '' && styles !== ''){
+        if (isTitleCard && styleTarget !== '' && styles !== '') {
             let stylesArray = parseStylesFromStringToObject(styles);
             console.log(stylesArray);
 
@@ -98,80 +98,181 @@ limitations under the License.
                 }
             `));
         }
+
+        if (isTitleCard && styleTarget && styles) {
+            let element = el;
+            await applyTitleCardStyles(element, styleTarget, styles);
+        }
+
         loading = false;
     });
 
-    function createShadowStyle($style: string){
+    /**
+     * Asynchronously waits for an element to exist in the DOM.
+     * Searches within the element and its shadow roots.
+     */
+    async function waitForElement(
+        rootElement: HTMLElement,
+        selector: string,
+        timeout = 5000
+    ): Promise<Element | null> {
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+
+            const findElement = (element: Element | ShadowRoot): Element | null => {
+                const found = element.querySelector(selector);
+                if (found) return found;
+
+                // Search in all child elements for shadow roots
+                for (const child of Array.from(element.children)) {
+                    if (child.shadowRoot) {
+                        const foundInShadow = findElement(child.shadowRoot);
+                        if (foundInShadow) return foundInShadow;
+                    }
+                }
+                return null;
+            };
+
+            const check = () => {
+                const element = findElement(rootElement);
+                if (element) {
+                    resolve(element);
+                } else if (Date.now() - startTime > timeout) {
+                    console.warn(`Element "${selector}" not found within timeout.`);
+                    resolve(null);
+                } else {
+                    requestAnimationFrame(check);
+                }
+            };
+
+            check();
+        });
+    }
+
+    async function applyTitleCardStyles(cardElement: LovelaceCard, targetSelector: string, stylesString: string) {
+        const targetElement = await waitForElement(cardElement, targetSelector);
+        if (targetElement) {
+            const stylesObject = parseStylesFromStringToObject(stylesString);
+            const cssRules = createCssRules(stylesObject);
+            if (cssRules) {
+                targetElement.prepend(createShadowStyle(cssRules));
+            }
+        }
+    }
+
+    function createShadowStyle(style: string): HTMLStyleElement {
         const shadowStyle = document.createElement('style');
-        shadowStyle.innerHTML = $style;
+        shadowStyle.innerHTML = style;
         return shadowStyle;
     }
 
-    function parseStylesFromStringToObject(styles: string){
-        let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
-                <selector>=<style1>:<value1>|<style2>:<value2>`;
+    function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
+        const errorMsg = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
+            <selector>=<style1>:<value1>|<style2>:<value2>`;
 
-        let generatedStyles: any = {};
-        let data = styles.split(',');
+        if (!stylesStr) return {};
 
-        if (data.length === 0) {
-            console.warn(error, 'configSplit');
-            return generatedStyles;
+        try {
+            return Object.fromEntries(
+                stylesStr.split(',').map((part) => {
+                    const [selector, styles] = part.trim().split('=');
+                    if (!selector || !styles) throw new Error();
+
+                    const styleArray = styles.split('|').map((stylePair) => {
+                        const [style, value] = stylePair.trim().split(':');
+                        if (!style || !value) throw new Error();
+                        return {style, value};
+                    });
+
+                    return [selector, styleArray];
+                })
+            );
+        } catch (e) {
+            console.warn(errorMsg, stylesStr);
+            return {};
         }
-
-        data.forEach(function (item, index) {
-            let styleData = item.split(',');
-
-            styleData.forEach(function (styleConfig, index) {
-                let selectorSplit = styleConfig.split('=');
-
-                if (selectorSplit.length !== 2) {
-                    console.warn(error, 'selectorSplit', selectorSplit);
-                    return;
-                }
-
-                let selector = selectorSplit[0];
-                let stylesSplit = selectorSplit[1].split('|');
-
-                let generatedStyle: Array<object> = [];
-
-                stylesSplit.forEach(function (style, index) {
-                    let styleSplit = style.split(':');
-
-                    if (styleSplit.length !== 2) {
-                        console.warn(error, 'styleSplit', styleSplit);
-                        return;
-                    }
-
-                    generatedStyle.push({
-                        style: styleSplit[0],
-                        value: styleSplit[1],
-                    })
-                });
-
-                generatedStyles[selector] = generatedStyle
-            });
-        });
-
-        return generatedStyles;
     }
 
-    function createCssRules(objects: object){
-        return Object.entries(objects).map(function ([selector, styles]) {
-            return `${selector} {
+    function createCssRules(objects: Record<string, CssStyleObject[]>): string {
+        return Object.entries(objects).map(([selector, styles]) => `${selector} {
                 ${createCssStyles(styles)}
-            }`;
-        }).join("\n").trim();
+            }`)
+            .join('\n')
+            .trim();
     }
 
-    function createCssStyles(stylesArray: Array<CssStyleObject>){
-        return stylesArray.map(function (styleObject: CssStyleObject) {
-            return `${styleObject.style}: ${styleObject.value};`;
-        }).join("\n").trim();
+    function createCssStyles(stylesArray: CssStyleObject[]): string {
+        return stylesArray
+            .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
+            .join('\n')
+            .trim();
     }
+
+    // function parseStylesFromStringToObject(styles: string){
+    //     let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
+    //             <selector>=<style1>:<value1>|<style2>:<value2>`;
+    //
+    //     let generatedStyles: any = {};
+    //     let data = styles.split(',');
+    //
+    //     if (data.length === 0) {
+    //         console.warn(error, 'configSplit');
+    //         return generatedStyles;
+    //     }
+    //
+    //     data.forEach(function (item, index) {
+    //         let styleData = item.split(',');
+    //
+    //         styleData.forEach(function (styleConfig, index) {
+    //             let selectorSplit = styleConfig.split('=');
+    //
+    //             if (selectorSplit.length !== 2) {
+    //                 console.warn(error, 'selectorSplit', selectorSplit);
+    //                 return;
+    //             }
+    //
+    //             let selector = selectorSplit[0];
+    //             let stylesSplit = selectorSplit[1].split('|');
+    //
+    //             let generatedStyle: Array<object> = [];
+    //
+    //             stylesSplit.forEach(function (style, index) {
+    //                 let styleSplit = style.split(':');
+    //
+    //                 if (styleSplit.length !== 2) {
+    //                     console.warn(error, 'styleSplit', styleSplit);
+    //                     return;
+    //                 }
+    //
+    //                 generatedStyle.push({
+    //                     style: styleSplit[0],
+    //                     value: styleSplit[1],
+    //                 })
+    //             });
+    //
+    //             generatedStyles[selector] = generatedStyle
+    //         });
+    //     });
+    //
+    //     return generatedStyles;
+    // }
+
+    // function createCssRules(objects: object){
+    //     return Object.entries(objects).map(function ([selector, styles]) {
+    //         return `${selector} {
+    //             ${createCssStyles(styles)}
+    //         }`;
+    //     }).join("\n").trim();
+    // }
+    //
+    // function createCssStyles(stylesArray: Array<CssStyleObject>){
+    //     return stylesArray.map(function (styleObject: CssStyleObject) {
+    //         return `${styleObject.style}: ${styleObject.value};`;
+    //     }).join("\n").trim();
+    // }
 </script>
 
-<svelte:element this={type} bind:this={container} transition:slide|local />
+<svelte:element this={type} bind:this={container} transition:slide|local/>
 {#if loading}
     <span style={'padding: 1em; display: block; '}> Loading... </span>
 {/if}
