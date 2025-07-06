@@ -66,7 +66,7 @@
         hass,
         self,
         config = defaults,
-    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement} = $props();
+    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement } = $props();
 
     onMount(() => {
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;
@@ -98,13 +98,13 @@
         <div class={`title-card-header${config['title-card-button-overlay'] ? '-overlay' : ''}`}>
             <div class="title-card-container" style="--title-padding:{config['title-card-padding']}; --ha-card-background:{config['title-card-background']};">
                 <Card
-                    hass={hass}
-                    config={config['title-card']}
-                    type={config['title-card'].type}
-                    clearChild={config['clear-children'] || false}
-                    isTitleCard={true}
-                    styleTarget={config['title-card-style-target']}
-                    styles={config['title-card-font-sizes']} />
+                        hass={hass}
+                        config={config['title-card']}
+                        type={config['title-card'].type}
+                        clearChild={config['clear-children'] || false}
+                        isTitleCard={true}
+                        styleTarget={config['title-card-style-target']}
+                        styles={config['title-card-font-sizes']}/>
             </div>
             <button
                     aria-label="Toggle"
@@ -166,123 +166,109 @@
 </ha-card>
 
 
-{@html `<style>
-        .expander-card-ultimate {
-            display: grid;
-            padding: var(--padding);
-            grid-template-rows: 0fr;
-            transition: all 0.5s ease-in-out;
+<style>
+    .expander-card-ultimate {
+        display: grid;
+        padding: var(--padding);
+        grid-template-rows: 0fr;
+        transition: all 0.5s ease-in-out;
+    }
+
+    .animation-wrapper {
+        display: grid;
+        overflow: hidden;
+        grid-template-rows: 0;
+        transition: grid-template-rows 0.5s ease-in-out;
+    }
+
+    .children-container {
+        padding: var(--child-padding);
+        display: grid;
+        gap: var(--gap);
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
+
+        & > :global(:first-child) {
+            margin-top: var(--gap);
         }
+    }
 
-        .animation-wrapper {
-            display: grid;
-            overflow: hidden;
-            grid-template-rows: 0;
-            transition: grid-template-rows 0.5s ease-in-out;
-        }
+    .clear {
+        background-color: transparent;
+        border-style: none;
+    }
 
-        .children-container {
-            padding: var(--child-padding);
-            display: grid;
-            gap: var(--gap);
-            transition: all 0.3s ease-in-out;
-            overflow: hidden;
-
-            & > :global(:first-child) {
-                margin-top: var(--gap);
-            }
-        }
-
-        .clear {
-            background-color: transparent;
-            border-style: none;
-        }
-
-        .clear-children {
-            & :global(::slotted(ha-card)) {
-                background-color: transparent !important;
-                border-style: none !important;
-            }
-        }
-
-        :global(::slotted(ha-card)) {
+    .clear-children {
+        & :global(::slotted(ha-card)) {
             background-color: transparent !important;
             border-style: none !important;
         }
+    }
 
-        .title-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-direction: row;
-        }
+    :global(::slotted(ha-card)) {
+        background-color: transparent !important;
+        border-style: none !important;
+    }
 
-
-
-        .title-card-header-overlay {
-            display: block;
-            padding: var(--title-card-margin);
-
-            & :global(h2) {
-                padding: 0;
-                margin: 0;
-                font-weight: 300 !important;
-              }
-            & :global(p) {
-                padding: 0;
-                margin: 0;
-              }
-
-              ${dynamicStyle}
-        }
+    .title-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+    }
 
 
-        .header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 0.8em 0.8em;
-            margin: 2px;
-            background: var(--button-background);
-            border-style: none;
-        }
+    .title-card-header-overlay {
+        display: block;
+        padding: var(--title-card-margin);
+    }
 
-        .header-overlay {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin: var(--overlay-margin);
-        }
 
-        .title {
-            width: 100%;
-            text-align: left;
-        }
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.8em 0.8em;
+        margin: 2px;
+        background: var(--button-background);
+        border-style: none;
+    }
 
-        .ico {
-            color: var(--primary-text-color);
-            transition-property: transform;
-            transition-duration: 0.35s;
-        }
+    .header-overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: var(--overlay-margin);
+    }
 
-        .flipped {
-            transform: rotate(180deg);
-        }
+    .title {
+        width: 100%;
+        text-align: left;
+    }
 
-        .ripple {
-            background-position: center;
-            transition: background 0.8s;
-            border-radius: 1em;
-        }
+    .ico {
+        color: var(--primary-text-color);
+        transition-property: transform;
+        transition-duration: 0.35s;
+    }
 
-        .ripple:hover {
-            background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
-        }
+    .flipped {
+        transform: rotate(180deg);
+    }
 
-        .ripple:active {
-            background-color: #ffffff25;
-            background-size: 100%;
-            transition: background 0s;
-        }
-    </style>`
-}
+    .ripple {
+        background-position: center;
+        transition: background 0.8s;
+        border-radius: 1em;
+    }
+
+    .ripple:hover {
+        background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
+    }
+
+    .ripple:active {
+        background-color: #ffffff25;
+        background-size: 100%;
+        transition: background 0s;
+    }
+</style>
