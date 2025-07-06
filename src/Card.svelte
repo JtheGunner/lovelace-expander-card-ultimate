@@ -46,8 +46,6 @@ limitations under the License.
     });
 
 
-
-
     onMount(async () => {
         console.log('SUB-CARD MOUNTED:', new Date().toLocaleTimeString());
         const util = await getCardUtil();
@@ -73,7 +71,7 @@ limitations under the License.
             `));
 
         let element = el;
-        let styles = trimPipe(trimPipe(customStyles)+';;'+trimPipe(defaultStyles));
+        let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
         console.log('element', element);
         console.log(customStyles);
         console.log(defaultStyles);
@@ -90,7 +88,7 @@ limitations under the License.
         console.log('SUB-CARD DESTROYED:', new Date().toLocaleTimeString());
     });
 
-    function trimPipe(str: string): string{
+    function trimPipe(str: string): string {
         return str.replace(/^;+|;+$/g, '');
     }
 
@@ -98,191 +96,172 @@ limitations under the License.
      * Asynchronously waits for an element to exist in the DOM.
      * Searches within the element and its shadow roots.
      */
-    async function waitForElement(
-        rootElement: HTMLElement,
-        selector: string,
-        timeout = 9000
-    ): Promise<Element | null> {
+    async function waitForElements(
+        element: any,
+        targetNames: Array<string>,
+        targetElements: any = {},
+    ): Promise<object | null> {
         return new Promise((resolve) => {
-            const startTime = Date.now();
+            const selector = targetNames.join(',');
 
-            const findElement = (element: any): Element | null => {
-                const found = element.querySelector(selector);
-                if (found) return element;
+            const foundElements = element.querySelectorAll(selector);
 
-                // Search in all child elements for shadow roots
-                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-                if (nextObject !== null) {
-                    const foundInShadow = findElement(nextObject);
-                    if (foundInShadow) return foundInShadow;
-                }
-                return null;
-            };
+            foundElements.forEach((found: any) => {
+                let foundName = found.localName;
+                targetElements[foundName] = element;
+                targetNames = targetNames.filter(function (name: string) {
+                    return name !== foundName
+                })
+            });
 
-            const check = () => {
-                const element = findElement(rootElement);
-                if (element) {
-                    resolve(element);
-                } else if (Date.now() - startTime > timeout) {
-                    console.warn(`Element "${selector}" not found within timeout.`);
-                    resolve(null);
-                } else {
-                    requestAnimationFrame(check);
-                }
-            };
+            let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
 
-            check();
+            if (targetNames.length > 0 && nextObject !== null) {
+                targetElements = waitForElements(nextObject, targetNames, targetElements)
+            }
+
+            resolve(targetElements);
         });
-    }
 
-    async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
-        const parsedObjects = parseStyleString(styles);
-        console.log('parseStyleString', parsedObjects);
-        return;
-        const targetElement = await waitForElement(cardElement, targetSelector);
-        console.log('targetElement', targetElement);
-        console.log('style element vorhanden', targetElement?.querySelector('style'))
+        async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
+            const parsedObjects: any = parseStyleString(styles);
+            const targets = Object.keys(parsedObjects);
+            const targetElements = await waitForElements(cardElement, targets, {});
 
-        if (targetElement && targetElement.querySelector('style') === null) {
-            const cssRules = createCssRules(parseStylesFromStringToObject(styles));
-            console.log('cssRules', cssRules);
+            console.log('parseStyleString', parsedObjects, targetElements);
+            console.log('targetElement', targetElements);
+            // console.log('style element vorhanden', targetElement?.querySelector('style'))
 
-            if (cssRules) {
-                targetElement.prepend(createShadowStyle(cssRules));
+            if (targetElements === null) return;
+
+            for (const [targetName, element] of Object.entries(targetElements)) {
+                let cssRule = createCssRules(parsedObjects[targetName]);
+
+                if (cssRule) {
+                    element.prepend(createShadowStyle(cssRule));
+                }
             }
         }
-    }
 
 
+        function createShadowStyle(style: string): HTMLStyleElement {
+            const shadowStyle = document.createElement('style');
+            shadowStyle.innerHTML = style;
+            return shadowStyle;
+        }
 
-    function createShadowStyle(style: string): HTMLStyleElement {
-        const shadowStyle = document.createElement('style');
-        shadowStyle.innerHTML = style;
-        return shadowStyle;
-    }
+        /**
+         * parse a separator based string to valid css config by their matching dom-targets
+         *
+         * Hierarchy of separators:
+         * 1. `;;` -> split the basic groups (domTarget + configs)
+         * 2. `:::` -> split domTargets from their configurations
+         * 3. `&&` -> split multiple selectors from the same domTarget
+         * 4. `||` -> split css-selectors from their style-configs
+         * 5. `,`  -> split multiple style declarations
+         * 6. `:`  -> split style key from value
+         *
+         * @param {string} inputString separator based string
+         * @returns {object} structured object to generate css
+         */
+        function parseStyleString(inputString: string): object {
+            const finalStructure: any = {};
 
-    function getTargetSelectors(styles: string){
-        let split = styles.split(';;');
-        let data = {};
+            if (!inputString) {
+                return finalStructure;
+            }
 
-        split.forEach(function (configString, index){
-            let split = styles.split(';;');
-        });
+            const groups = inputString.split(';;');
 
-    }
+            for (const group of groups) {
+                if (!group) continue;
 
-    /**
-     * parse a separator based string to valid css config by their matching dom-targets
-     *
-     * Hierarchy of separators:
-     * 1. `;;` -> split the basic groups (domTarget + configs)
-     * 2. `:::` -> split domTargets from their configurations
-     * 3. `&&` -> split multiple selectors from the same domTarget
-     * 4. `||` -> split css-selectors from their style-configs
-     * 5. `,`  -> split multiple style declarations
-     * 6. `:`  -> split style key from value
-     *
-     * @param {string} inputString separator based string
-     * @returns {object} structured object to generate css
-     */
-    function parseStyleString(inputString: string) {
-        const finalStructure: any = {};
+                // 2. domTarget von der CSS-Konfiguration trennen
+                const [domTarget, cssConfig] = group.split(':::');
+                if (!domTarget || !cssConfig) continue;
 
-        if (!inputString) {
+                // Initialisiere das Objekt für diesen domTarget, falls nicht vorhanden
+                finalStructure[domTarget] = finalStructure[domTarget] || {};
+
+                // 3. Mehrere Selektoren trennen
+                const selectorBlocks = cssConfig.split('&&');
+
+                for (const block of selectorBlocks) {
+                    if (!block) continue;
+
+                    // 4. Selektor von den Styles trennen
+                    const [selector, stylesString] = block.split('||');
+                    if (!selector || !stylesString) continue;
+
+                    // 5. & 6. Styles parsen
+                    const styles = stylesString
+                        .split(',')
+                        .map(stylePair => {
+                            if (!stylePair) return null;
+
+                            // Trennt Key und Value, auch wenn Value selbst ein ':' enthält
+                            const [key, ...valueParts] = stylePair.split(':');
+                            const value = valueParts.join(':');
+
+                            if (!key || value === undefined) return null;
+
+                            return {key: key.trim(), value: value.trim()};
+                        })
+                        .filter(Boolean); // remove potential null values
+
+                    if (styles.length > 0) {
+                        finalStructure[domTarget][selector.trim()] = styles;
+                    }
+                }
+            }
+
             return finalStructure;
         }
 
-        const groups = inputString.split(';;');
+        function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
+            const errorMsg = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
+            <selector>=<style1>:<value1>|<style2>:<value2>`;
 
-        for (const group of groups) {
-            if (!group) continue;
+            if (!stylesStr) return {};
 
-            // 2. domTarget von der CSS-Konfiguration trennen
-            const [domTarget, cssConfig] = group.split(':::');
-            if (!domTarget || !cssConfig) continue;
+            try {
+                return Object.fromEntries(
+                    stylesStr.split(';;').map((part) => {
+                        const [domElement, styleConfig] = part.trim().split(':::');
+                        if (!domElement || !styleConfig) throw new Error();
 
-            // Initialisiere das Objekt für diesen domTarget, falls nicht vorhanden
-            finalStructure[domTarget] = finalStructure[domTarget] || {};
+                        const [selector, style] = part.trim().split('||');
+                        if (!selector || !style) throw new Error();
 
-            // 3. Mehrere Selektoren trennen
-            const selectorBlocks = cssConfig.split('&&');
+                        const styleArray = styleConfig.split('|').map((stylePair) => {
+                            const [style, value] = stylePair.trim().split(':');
+                            if (!style || !value) throw new Error();
+                            return {style, value};
+                        });
 
-            for (const block of selectorBlocks) {
-                if (!block) continue;
-
-                // 4. Selektor von den Styles trennen
-                const [selector, stylesString] = block.split('||');
-                if (!selector || !stylesString) continue;
-
-                // 5. & 6. Styles parsen
-                const styles = stylesString
-                    .split(',')
-                    .map(stylePair => {
-                        if (!stylePair) return null;
-
-                        // Trennt Key und Value, auch wenn Value selbst ein ':' enthält
-                        const [key, ...valueParts] = stylePair.split(':');
-                        const value = valueParts.join(':');
-
-                        if (!key || value === undefined) return null;
-
-                        return { key: key.trim(), value: value.trim() };
+                        return [domElement, styleArray];
                     })
-                    .filter(Boolean); // remove potential null values
-
-                if (styles.length > 0) {
-                    finalStructure[domTarget][selector.trim()] = styles;
-                }
+                );
+            } catch (e) {
+                console.warn(errorMsg, stylesStr);
+                return {};
             }
         }
 
-        return finalStructure;
-    }
-
-    function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
-        const errorMsg = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
-            <selector>=<style1>:<value1>|<style2>:<value2>`;
-
-        if (!stylesStr) return {};
-
-        try {
-            return Object.fromEntries(
-                stylesStr.split(';;').map((part) => {
-                    const [domElement, styleConfig] = part.trim().split(':::');
-                    if (!domElement || !styleConfig) throw new Error();
-
-                    const [selector, style] = part.trim().split('||');
-                    if (!selector || !style) throw new Error();
-
-                    const styleArray = styleConfig.split('|').map((stylePair) => {
-                        const [style, value] = stylePair.trim().split(':');
-                        if (!style || !value) throw new Error();
-                        return {style, value};
-                    });
-
-                    return [domElement, styleArray];
-                })
-            );
-        } catch (e) {
-            console.warn(errorMsg, stylesStr);
-            return {};
-        }
-    }
-
-    function createCssRules(objects: Record<string, CssStyleObject[]>): string {
-        return Object.entries(objects).map(([selector, styles]) => `${selector} {
+        function createCssRules(objects: Record<string, CssStyleObject[]>): string {
+            return Object.entries(objects).map(([selector, styles]) => `${selector} {
                 ${createCssStyles(styles)}
             }`)
-            .join('\n')
-            .trim();
-    }
+                .join('\n')
+                .trim();
+        }
 
-    function createCssStyles(stylesArray: CssStyleObject[]): string {
-        return stylesArray
-            .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
-            .join('\n')
-            .trim();
-    }
+        function createCssStyles(stylesArray: CssStyleObject[]): string {
+            return stylesArray
+                .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
+                .join('\n')
+                .trim();
+        }
 
     // function parseStylesFromStringToObject(styles: string){
     //     let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
