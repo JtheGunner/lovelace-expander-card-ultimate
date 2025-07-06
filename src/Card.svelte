@@ -18,7 +18,7 @@ limitations under the License.
 <script lang="ts">
     import type {HomeAssistant, LovelaceCard, LovelaceCardConfig} from 'custom-card-helpers';
     import {getCardUtil} from './cardUtil.svelte';
-    import {onDestroy, onMount} from 'svelte';
+    import {onDestroy, onMount, tick} from 'svelte';
     import {slide} from 'svelte/transition';
 
     type CssStyleObject = {
@@ -62,6 +62,8 @@ limitations under the License.
         if (clearChild) {
 
         }
+
+        await tick();
 
         el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
@@ -123,7 +125,7 @@ limitations under the License.
             console.log('element.shadowRoot', element.shadowRoot);
 
             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-            console.log('nextObject', nextObject);
+                console.log('nextObject', nextObject);
 
             if (targetNames.length > 0 && nextObject !== null) {
                 targetElements = await waitForElements(nextObject, targetNames, targetElements)
