@@ -101,10 +101,12 @@ limitations under the License.
         targetNames: Array<string>,
         targetElements: any = {},
     ): Promise<object | null> {
-        return new Promise((resolve) => {
-            const selector = targetNames.join(',');
+        return new Promise(async (resolve) => {
+            const selector = targetNames.join(', ');
+            console.log('selector', selector);
 
             const foundElements = element.querySelectorAll(selector);
+            console.log('foundElements', foundElements)
 
             foundElements.forEach((found: any) => {
                 let foundName = found.localName;
@@ -114,10 +116,14 @@ limitations under the License.
                 })
             });
 
+            console.log('targetElements', targetElements);
+            console.log('targetNames', targetNames);
+
             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+            console.log('nextObject', nextObject);
 
             if (targetNames.length > 0 && nextObject !== null) {
-                targetElements = waitForElements(nextObject, targetNames, targetElements)
+                targetElements = await waitForElements(nextObject, targetNames, targetElements)
             }
 
             resolve(targetElements);
