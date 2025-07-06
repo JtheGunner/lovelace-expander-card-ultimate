@@ -68,6 +68,40 @@ limitations under the License.
         }
         loading = false;
 
+        function addStyles(element: any, styleObj: any, styleTarget: any) {
+            let maxLoops = 20;
+
+            while (maxLoops > 0) {
+                console.log(element);
+                if (element.querySelector(styleTarget)) {
+                    element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
+                        return `
+                            :global(${selector}) {
+                                font-size: ${size} !important;
+                            }
+
+                            & :global(${selector}) {
+                                font-size: ${size} !important;
+                            }
+                            `;
+                    }).join('')));
+                    break;
+                }
+
+                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+
+                console.log('nextObject', nextObject);
+
+                if (nextObject === null) {
+                    console.log('no valid child found to append styling');
+                    break;
+                }
+
+                element = nextObject;
+                maxLoops--;
+            }
+        }
+
         if(isTitleCard && styleTarget !== ''){
 
             console.log(el, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
@@ -104,35 +138,7 @@ limitations under the License.
 
 
 
-            while(maxLoops > 0){
-                console.log(element);
-                if(element.querySelector(styleTarget)){
-                    element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
-                        return `
-                            :global(${selector}) {
-                                font-size: ${size} !important;
-                            }
-
-                            & :global(${selector}) {
-                                font-size: ${size} !important;
-                            }
-                            `;
-                    }).join('')));
-                    break;
-                }
-
-                let nextObject: any =  element.shadowRoot !== undefined ? element.shadowRoot : (element.firstElementChild !== undefined ? element.firstElementChild : null);
-
-                console.log('nextObject', nextObject);
-
-                if(nextObject === null){
-                    console.log('no valid child found to append styling');
-                    break;
-                }
-
-                element = nextObject;
-                maxLoops--;
-            }
+            addStyles(maxLoops, element, styleObj);
         }
     });
 </script>
