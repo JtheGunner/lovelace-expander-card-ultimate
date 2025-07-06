@@ -103,6 +103,7 @@ limitations under the License.
     ): Promise<object | null> {
         return new Promise(async (resolve) => {
             const selector = targetNames.join(', ');
+            console.log('element', element);
             console.log('selector', selector);
 
             const foundElements = element.querySelectorAll(selector);
