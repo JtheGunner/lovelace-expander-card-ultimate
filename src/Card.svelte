@@ -124,7 +124,7 @@ limitations under the License.
     async function waitForElement(
         rootElement: HTMLElement,
         selector: string,
-        timeout = 5000
+        timeout = 9000
     ): Promise<Element | null> {
         return new Promise((resolve) => {
             const startTime = Date.now();
@@ -161,6 +161,8 @@ limitations under the License.
 
     async function applyTitleCardStyles(cardElement: LovelaceCard, targetSelector: string, stylesString: string) {
         const targetElement = await waitForElement(cardElement, targetSelector);
+        console.log('targetElement', targetElement);
+        console.log('style element vorhanden', targetElement?.querySelector('style'))
 
         if (targetElement && targetElement.querySelector('style') === null) {
             const cssRules = createCssRules(parseStylesFromStringToObject(stylesString));
