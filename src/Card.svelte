@@ -28,8 +28,8 @@ limitations under the License.
         clearChild = false,
         isTitleCard = false,
         styleTarget = '',
-        styles = {},
-    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean; isTitleCard: boolean; styleTarget: string; styles: {} } = $props();
+        styles = '',
+    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean; isTitleCard: boolean; styleTarget: string; styles: string } = $props();
 
     let container = $state<LovelaceCard>();
     let loading = $state(true);
@@ -70,14 +70,37 @@ limitations under the License.
 
         console.log('isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
 
-        if(isTitleCard && styleTarget !== '' && Object.keys(styles).length > 0){
+        if(isTitleCard && styleTarget !== '' && styles !== ''){
+            let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
             let maxLoops = 20;
-            let obj: any = el;
+            let element: any = el;
+            let styleObj: any = {};
+            let data = styles.split(',');
+
+            if(data.length === 0){
+                console.warn(error);
+                return;
+            }
+
+            data.forEach(function(item, index){
+                let stylePair = item.split(':');
+
+                if(stylePair.length !== 2){
+                    console.warn(error, {
+                        value: item
+                    });
+                    return;
+                }
+
+                styleObj[stylePair[0]] = stylePair[1];
+            });
+
+
 
             while(maxLoops > 0){
-                console.log(obj);
-                if(obj.querySelector(styleTarget)){
-                    obj.appendChild(createShadowStyle(Object.entries(styles).map(function ([selector, size]) {
+                console.log(element);
+                if(element.querySelector(styleTarget)){
+                    element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
                         return `
                             :global(${selector}) {
                                 font-size: ${size} !important;
@@ -91,14 +114,14 @@ limitations under the License.
                     break;
                 }
 
-                let nextObject: any =  obj.shadowRoot !== undefined ? obj.shadowRoot : (obj.firstElementChild !== undefined ? obj.firstElementChild : null);
+                let nextObject: any =  element.shadowRoot !== undefined ? element.shadowRoot : (element.firstElementChild !== undefined ? element.firstElementChild : null);
 
                 if(nextObject === null){
                     console.log('no valid child found to append styling');
                     break;
                 }
 
-                obj = nextObject;
+                element = nextObject;
                 maxLoops--;
             }
         }

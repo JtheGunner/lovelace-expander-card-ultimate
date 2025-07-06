@@ -9,9 +9,7 @@
         'clear-children': false,
         'title': 'Expander',
         'title-card-style-target': '',
-        'title-card-font-sizes': {
-            'h2': '16em'
-        },
+        'title-card-font-sizes': '',
         'title-card-margin': '0',
         'title-card-background': 'var(--card-background-color, #fff)',
         'overlay-margin': '2em',
@@ -68,18 +66,7 @@
         hass,
         self,
         config = defaults,
-        dynamicStyle = Object.entries(defaults['title-card-font-sizes']).map(function ([selector, size]) {
-            return `
-            :global(${selector}) {
-                font-size: ${size} !important;
-            }
-
-            & :global(${selector}) {
-                font-size: ${size} !important;
-            }
-            `;
-        }).join('')
-    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
+    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement} = $props();
 
     onMount(() => {
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;

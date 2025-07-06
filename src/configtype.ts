@@ -20,7 +20,7 @@ export interface ExpanderConfig {
     'padding': string;
     'title': string;
     'title-card-style-target': string;
-    'title-card-font-sizes': {};
+    'title-card-font-sizes': string;
     'title-card-margin'?: string;
     'title-card-background'?: string;
     'title-card'?: LovelaceCardConfig;
