@@ -121,7 +121,7 @@ limitations under the License.
         let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
                 <selector>=<style1>:<value1>|<style2>:<value2>`;
 
-        let generatedStyles: Array<object> = [];
+        let generatedStyles: any = {};
         let data = styles.split(',');
 
         if (data.length === 0) {
@@ -143,8 +143,7 @@ limitations under the License.
                 let selector = selectorSplit[0];
                 let stylesSplit = selectorSplit[1].split('|');
 
-                let generatedStyle: any = {};
-                generatedStyle[selector] = [];
+                let generatedStyle: Array<object> = [];
 
                 stylesSplit.forEach(function (style, index) {
                     let styleSplit = style.split(':');
@@ -154,13 +153,13 @@ limitations under the License.
                         return;
                     }
 
-                    generatedStyle[selector].push({
+                    generatedStyle.push({
                         style: styleSplit[0],
                         value: styleSplit[1],
                     })
                 });
 
-                generatedStyles.push(generatedStyle[selector])
+                generatedStyles[selector] = generatedStyle
             });
         });
 
