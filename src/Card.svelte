@@ -119,6 +119,8 @@ limitations under the License.
 
             console.log('targetElements', targetElements);
             console.log('targetNames', targetNames);
+            console.log('element.firstElementChild', element.firstElementChild);
+            console.log('element.shadowRoot', element.shadowRoot);
 
             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
             console.log('nextObject', nextObject);
