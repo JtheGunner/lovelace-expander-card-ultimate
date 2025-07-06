@@ -134,7 +134,7 @@ limitations under the License.
         });
     }
 
-    async function applyTitleCardStyles(cardElement: LovelaceCard, targetSelector: string, stylesString: string) {
+    async function applyTitleCardStyles(cardElement: LovelaceCard, stylesString: string) {
         const targetElement = await waitForElement(cardElement, targetSelector);
         console.log('targetElement', targetElement);
         console.log('style element vorhanden', targetElement?.querySelector('style'))

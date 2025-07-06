@@ -3,10 +3,10 @@
 
     const devMode = import.meta.env.MODE === 'dev';
     export const defaults = {
+        'clear': true,
+        'clear-children': false,
         'gap': '0.6em',
         'padding': '1em',
-        'clear': false,
-        'clear-children': false,
         'title': 'Expander',
         'title-card-custom-styles': '',
         'title-card-default-styles': '',

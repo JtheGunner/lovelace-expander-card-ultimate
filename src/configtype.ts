@@ -19,7 +19,6 @@ export interface ExpanderConfig {
     'gap': string;
     'padding': string;
     'title': string;
-    'title-card-style-target': string;
     'title-card-custom-styles': string;
     'title-card-default-styles': string;
     'title-card-margin'?: string;
