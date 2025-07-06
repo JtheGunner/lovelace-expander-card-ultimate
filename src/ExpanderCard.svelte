@@ -104,7 +104,7 @@
                         clearChild={config['clear-children'] || false}
                         isTitleCard={true}
                         customStyles={config['title-card-custom-styles']}
-                        defaultStyles={config['title-card-custom-styles']}/>
+                        defaultStyles={config['title-card-default-styles']}/>
             </div>
             <button
                     aria-label="Toggle"
