@@ -70,7 +70,7 @@ limitations under the License.
 
         if(isTitleCard && styleTarget !== ''){
 
-            console.log('isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+            console.log(el, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
 
             if(styles === ''){
                 return;
@@ -122,6 +122,8 @@ limitations under the License.
                 }
 
                 let nextObject: any =  element.shadowRoot !== undefined ? element.shadowRoot : (element.firstElementChild !== undefined ? element.firstElementChild : null);
+
+                console.log('nextObject', nextObject);
 
                 if(nextObject === null){
                     console.log('no valid child found to append styling');
