@@ -68,9 +68,14 @@ limitations under the License.
         }
         loading = false;
 
-        console.log('isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+        if(isTitleCard && styleTarget !== ''){
 
-        if(isTitleCard && styleTarget !== '' && styles !== ''){
+            console.log('isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+
+            if(styles === ''){
+                return;
+            }
+
             let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
             let maxLoops = 20;
             let element: any = el;
@@ -94,6 +99,8 @@ limitations under the License.
 
                 styleObj[stylePair[0]] = stylePair[1];
             });
+
+            console.log(styleObj);
 
 
 
