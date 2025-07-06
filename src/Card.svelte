@@ -161,19 +161,18 @@ limitations under the License.
 
     function createCssRules(objects: object){
         return Object.entries(objects).map(function ([selector, styles]) {
-            return `
-            ${selector} {
+            return `${selector} {
                 ${createCssStyles(styles)}
             }
             `;
-        }).join('');
+        }).join('').trim();
     }
 
     function createCssStyles(stylesArray: Array<CssStyleObject>){
         return stylesArray.map(function (styleObject: CssStyleObject) {
             return `${styleObject.style}: ${styleObject.value}
             `;
-        }).join('');
+        }).join('').trim();
     }
 </script>
 
