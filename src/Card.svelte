@@ -21,6 +21,11 @@ limitations under the License.
     import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
 
+    type CssStyleObject = {
+        style: string;
+        value: string;
+    };
+
     const {
         type = 'div',
         config,
@@ -73,8 +78,7 @@ limitations under the License.
 
             console.log(container, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
 
-
-            let stylesArray = parseStylesFromStringToArray(styles);
+            let stylesArray = parseStylesFromStringToObject(styles);
             console.log(stylesArray);
 
             setTimeout(() => {
@@ -85,27 +89,16 @@ limitations under the License.
                     console.log(element);
                     if (element.querySelector(styleTarget)) {
                         console.log('MATCH', element);
-                        // element.prepend(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
-                        //     return `
-                        //     ${selector} {
-                        //         padding: 0;
-                        //         margin: 0;
-                        //         font-weight: 300 !important;
-                        //         font-size: ${size} !important;
-                        //     }
-                        //     `;
-                        // }).join('')));
+                        console.log(createCssRules(stylesArray));
+                        element.prepend(createShadowStyle(createCssRules(stylesArray)));
                         break;
                     }
 
-                    console.log(element, element.firstElementChild, element.shadowRoot);
-
                     let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-
                     console.log('nextObject', nextObject);
 
                     if (nextObject === null) {
-                        console.log('no valid child found to append styling');
+                        console.log('no valid child found to append styles');
                         break;
                     }
 
@@ -117,7 +110,7 @@ limitations under the License.
         }
     });
 
-    function parseStylesFromStringToArray(styles: string){
+    function parseStylesFromStringToObject(styles: string){
         let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
                 <selector>=<style1>:<value1>|<style2>:<value2>`;
 
@@ -164,6 +157,23 @@ limitations under the License.
         });
 
         return generatedStyles;
+    }
+
+    function createCssRules(objects: object){
+        return Object.entries(objects).map(function ([selector, styles]) {
+            return `
+            ${selector} {
+                ${createCssStyles(styles)}
+            }
+            `;
+        }).join('');
+    }
+
+    function createCssStyles(stylesArray: Array<CssStyleObject>){
+        return stylesArray.map(function (styleObject: CssStyleObject) {
+            return `${styleObject.style}: ${styleObject.value}
+            `;
+        }).join('');
     }
 </script>
 
