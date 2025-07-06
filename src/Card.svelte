@@ -133,17 +133,14 @@ limitations under the License.
 
             const findElement = (element: any): Element | null => {
                 const found = element.querySelector(selector);
-                if (found) return found;
+                if (found) return element;
 
                 // Search in all child elements for shadow roots
-                // for (const child of Array.from(element.children)) {
-                    let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-                    if (nextObject !== null) {
-                        const foundInShadow = findElement(nextObject);
-                        if (foundInShadow) return foundInShadow;
-                    }
-
-                // }
+                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+                if (nextObject !== null) {
+                    const foundInShadow = findElement(nextObject);
+                    if (foundInShadow) return foundInShadow;
+                }
                 return null;
             };
 
