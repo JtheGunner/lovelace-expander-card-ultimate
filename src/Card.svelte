@@ -70,14 +70,14 @@ limitations under the License.
 
         if(isTitleCard && styleTarget !== ''){
 
-            console.log(el, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+            console.log(container, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
 
             if(styles === ''){
                 return;
             }
 
             let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
-            let element: any = el;
+            let element: any = container;
             let styleObj: any = {};
             let data = styles.split(',');
 
