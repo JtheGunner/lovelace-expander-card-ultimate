@@ -107,7 +107,9 @@ limitations under the License.
         }
 
         if (isTitleCard && styleTarget && styles) {
-            await applyTitleCardStyles(el, styleTarget, styles);
+            let element = el;
+            console.log('element', element)
+            await applyTitleCardStyles(element, styleTarget, styles);
         }
 
         loading = false;
@@ -129,17 +131,19 @@ limitations under the License.
         return new Promise((resolve) => {
             const startTime = Date.now();
 
-            const findElement = (element: Element | ShadowRoot): Element | null => {
+            const findElement = (element: any): Element | null => {
                 const found = element.querySelector(selector);
                 if (found) return found;
 
                 // Search in all child elements for shadow roots
-                for (const child of Array.from(element.children)) {
-                    if (child.shadowRoot) {
-                        const foundInShadow = findElement(child.shadowRoot);
+                // for (const child of Array.from(element.children)) {
+                    let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+                    if (nextObject !== null) {
+                        const foundInShadow = findElement(nextObject);
                         if (foundInShadow) return foundInShadow;
                     }
-                }
+
+                // }
                 return null;
             };
 
