@@ -166,6 +166,7 @@ limitations under the License.
 
         if (targetElement && targetElement.querySelector('style') === null) {
             const cssRules = createCssRules(parseStylesFromStringToObject(stylesString));
+            console.log('cssRules', cssRules);
 
             if (cssRules) {
                 targetElement.prepend(createShadowStyle(cssRules));
