@@ -18,7 +18,7 @@ limitations under the License.
 <script lang="ts">
     import type { LovelaceCard, HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';
     import { getCardUtil } from './cardUtil.svelte';
-    import {afterUpdate, onMount} from 'svelte';
+    import {onMount} from 'svelte';
     import { slide } from 'svelte/transition';
 
     type CssStyleObject = {
@@ -39,15 +39,41 @@ limitations under the License.
     let container = $state<LovelaceCard>();
     let loading = $state(true);
 
-    function createShadowStyle($style: string){
-        const shadowStyle = document.createElement('style');
-        shadowStyle.innerHTML = $style;
-        return shadowStyle;
-    }
-
     $effect(() => {
         if (container) {
             container.hass = hass;
+        }
+
+        if(isTitleCard && styleTarget !== '' && styles !== ''){
+            let stylesArray = parseStylesFromStringToObject(styles);
+            console.log(stylesArray);
+
+            // setTimeout(() => {
+            let element: any = container;
+            let maxLoops = 20;
+
+            while (maxLoops > 0) {
+                console.log(element);
+                if (element.querySelector(styleTarget)) {
+                    console.log('MATCH', element);
+                    console.log(createCssRules(stylesArray));
+                    element.prepend(createShadowStyle(createCssRules(stylesArray)));
+                    break;
+                }
+
+                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+                console.log('nextObject', nextObject);
+
+                if (nextObject === null) {
+                    console.log('no valid child found to append styles');
+                    break;
+                }
+
+                element = nextObject;
+                maxLoops--;
+            }
+            // }, 100);
+
         }
     });
 
@@ -75,39 +101,11 @@ limitations under the License.
         loading = false;
     });
 
-    $effect(() => {
-        if(isTitleCard && styleTarget !== '' && styles !== ''){
-            let stylesArray = parseStylesFromStringToObject(styles);
-            console.log(stylesArray);
-
-            // setTimeout(() => {
-                let element: any = container;
-                let maxLoops = 20;
-
-                while (maxLoops > 0) {
-                    console.log(element);
-                    if (element.querySelector(styleTarget)) {
-                        console.log('MATCH', element);
-                        console.log(createCssRules(stylesArray));
-                        element.prepend(createShadowStyle(createCssRules(stylesArray)));
-                        break;
-                    }
-
-                    let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-                    console.log('nextObject', nextObject);
-
-                    if (nextObject === null) {
-                        console.log('no valid child found to append styles');
-                        break;
-                    }
-
-                    element = nextObject;
-                    maxLoops--;
-                }
-            // }, 100);
-
-        }
-    });
+    function createShadowStyle($style: string){
+        const shadowStyle = document.createElement('style');
+        shadowStyle.innerHTML = $style;
+        return shadowStyle;
+    }
 
     function parseStylesFromStringToObject(styles: string){
         let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
