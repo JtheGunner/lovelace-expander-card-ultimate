@@ -18,7 +18,7 @@ limitations under the License.
 <script lang="ts">
     import type {HomeAssistant, LovelaceCard, LovelaceCardConfig} from 'custom-card-helpers';
     import {getCardUtil} from './cardUtil.svelte';
-    import {onMount} from 'svelte';
+    import {onDestroy, onMount} from 'svelte';
     import {slide} from 'svelte/transition';
 
     type CssStyleObject = {
