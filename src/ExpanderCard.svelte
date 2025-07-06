@@ -1,7 +1,7 @@
-
 <script lang="ts" module>
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     import Editor from './ExpanderCardEditor.svelte';
+
     const devMode = import.meta.env.MODE === 'dev';
     export const defaults = {
         'gap': '0.6em',
@@ -43,18 +43,18 @@
             this.config = { ...defaults, ...conf };
         };
     }
-}} />
+}}/>
 
 <script lang="ts">
 
     // import { default as Editor } from './ExpanderCardEditor.svelte';
 
-    import { slide } from 'svelte/transition';
-    import type { HomeAssistant } from 'custom-card-helpers';
+    import {slide} from 'svelte/transition';
+    import type {HomeAssistant} from 'custom-card-helpers';
     import Card from './Card.svelte';
 
-    import type { ExpanderConfig } from './configtype';
-    import { onMount } from 'svelte';
+    import type {ExpanderConfig} from './configtype';
+    import {onMount} from 'svelte';
 
     let expanded = $state(false);
 
@@ -64,7 +64,7 @@
         hass,
         self,
         config = defaults
-    }: {hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement} = $props();
+    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement } = $props();
 
     onMount(() => {
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;
@@ -88,25 +88,25 @@
 </script>
 
 <ha-card
-    class={`expander-card-ultimate ${config.clear ? 'clear' : ''}`}
-    style="--padding:{config.padding}; --gap:{config.gap}; --title-card-margin:{config['title-card-margin']}; --ha-card-background:{config['title-card-background']};"
+        class={`expander-card-ultimate ${config.clear ? 'clear' : ''}`}
+        style="--padding:{config.padding}; --gap:{config.gap}; --title-card-margin:{config['title-card-margin']};"
 >
     {#if config['title-card']}
         <div class={`title-card-header${config['title-card-button-overlay'] ? '-overlay' : ''}`}>
-            <div class="title-card-container" style="--title-padding:{config['title-card-padding']}">
+            <div class="title-card-container" style="--title-padding:{config['title-card-padding']}; --ha-card-background:{config['title-card-background']};">
                 <Card
-                    hass={hass}
-                    config={config['title-card']}
-                    type={config['title-card'].type}
-                    clearChild={config['clear-children'] || false} />
+                        hass={hass}
+                        config={config['title-card']}
+                        type={config['title-card'].type}
+                        clearChild={config['clear-children'] || false}/>
             </div>
             <button
-            aria-label="Toggle"
-                style="--overlay-margin:{config['overlay-margin']}; --button-background:{config[
+                    aria-label="Toggle"
+                    style="--overlay-margin:{config['overlay-margin']}; --button-background:{config[
                     'button-background'
                 ]};"
-                class={`header ripple ${config['title-card-button-overlay'] ? 'header-overlay' : ''}`}
-                onclick={() => {
+                    class={`header ripple ${config['title-card-button-overlay'] ? 'header-overlay' : ''}`}
+                    onclick={() => {
                     expanded = !expanded;
                     if (config['expand-id'] !== undefined) {
                         try {
@@ -118,13 +118,13 @@
                     }
                 }}
             >
-                <ha-icon icon="mdi:chevron-down" class={`primaryico ${expanded ? 'flipped' : ''}`} ></ha-icon>
+                <ha-icon icon="mdi:chevron-down" class={`primaryico ${expanded ? 'flipped' : ''}`}></ha-icon>
             </button>
         </div>
     {:else}
         <button
-            class="header ripple"
-            onclick={() => {
+                class="header ripple"
+                onclick={() => {
                 expanded = !expanded;
                 if (config['expand-id'] !== undefined) {
                     try {
@@ -135,24 +135,24 @@
                     }
                 }
             }}
-            style="--button-background:{config['button-background']};"
+                style="--button-background:{config['button-background']};"
         >
             <div class="primary title">{config.title}</div>
-            <ha-icon icon="mdi:chevron-down" class={` primaryico ${expanded ? 'flipped' : ''}`} ></ha-icon>
+            <ha-icon icon="mdi:chevron-down" class={` primaryico ${expanded ? 'flipped' : ''}`}></ha-icon>
         </button>
     {/if}
     {#if config.cards}
         <div class="animation-wrapper" style="grid-template-rows: {expanded ? '1fr' : '0fr'};">
             <div
-                style={`--gap:${config.gap}; --child-padding:${config['child-padding']};`}
-                class="children-container"
+                    style={`--gap:${config.gap}; --child-padding:${config['child-padding']};`}
+                    class="children-container"
             >
                 {#each config.cards as card (card)}
-                        <Card
+                    <Card
                             hass={hass}
                             config={card}
                             type={card.type}
-                            clearChild={config['clear-children'] || false} />
+                            clearChild={config['clear-children'] || false}/>
                 {/each}
             </div>
         </div>
@@ -175,19 +175,22 @@
     }
 
     .children-container {
-        padding:  var(--child-padding);
+        padding: var(--child-padding);
         display: grid;
         gap: var(--gap);
         transition: all 0.3s ease-in-out;
         overflow: hidden;
+
         & > :global(:first-child) {
             margin-top: var(--gap);
         }
     }
+
     .clear {
         background-color: transparent;
         border-style: none;
     }
+
     .clear-children {
         & :global(::slotted(ha-card)) {
             background-color: transparent !important;
@@ -206,14 +209,17 @@
         justify-content: space-between;
         flex-direction: row;
     }
+
     .title-card-header-overlay {
         display: block;
         padding: var(--title-card-margin);
     }
+
     .title-card-container {
         width: 100%;
         padding: var(--title-padding);
     }
+
     .header {
         display: flex;
         flex-direction: row;
@@ -223,16 +229,19 @@
         background: var(--button-background);
         border-style: none;
     }
+
     .header-overlay {
         position: absolute;
         top: 0;
         right: 0;
         margin: var(--overlay-margin);
     }
+
     .title {
         width: 100%;
         text-align: left;
     }
+
     .ico {
         color: var(--primary-text-color);
         transition-property: transform;
@@ -248,9 +257,11 @@
         transition: background 0.8s;
         border-radius: 1em;
     }
+
     .ripple:hover {
         background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
     }
+
     .ripple:active {
         background-color: #ffffff25;
         background-size: 100%;
