@@ -10,10 +10,11 @@
         'clear-children': false,
         'title': 'Expander',
         'title-card-margin': '0',
-        'title-card-background': 'transparent',
+        'title-card-background': 'var(--card-background-color, #fff)',
         'overlay-margin': '2em',
         'child-padding': '0.5em',
-        'button-background': 'transparent'
+        'button-background': 'transparent',
+        'fontSizes': {}
     };
 </script>
 
@@ -59,12 +60,21 @@
     let expanded = $state(false);
 
     let isEditorMode = $state(false);
+
+    const dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes)
+        .map(([selector, size]) => `
+        .title-card-container :global(${selector}) {
+            font-size: ${size} !important;
+        }
+    `).join(''));
+
     // add fields used in customClass as props.
     const {
         hass,
         self,
-        config = defaults
-    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement } = $props();
+        config = defaults,
+        dynamicStyle = dynamicStyleTmp
+    }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
 
     onMount(() => {
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;
@@ -159,112 +169,116 @@
     {/if}
 </ha-card>
 
-<style>
-    .expander-card-ultimate {
-        display: grid;
-        padding: var(--padding);
-        grid-template-rows: 0fr;
-        transition: all 0.5s ease-in-out;
-    }
-
-    .animation-wrapper {
-        display: grid;
-        overflow: hidden;
-        grid-template-rows: 0;
-        transition: grid-template-rows 0.5s ease-in-out;
-    }
-
-    .children-container {
-        padding: var(--child-padding);
-        display: grid;
-        gap: var(--gap);
-        transition: all 0.3s ease-in-out;
-        overflow: hidden;
-
-        & > :global(:first-child) {
-            margin-top: var(--gap);
+<!--<svelte:head>-->
+    <style>
+        .expander-card-ultimate {
+            display: grid;
+            padding: var(--padding);
+            grid-template-rows: 0fr;
+            transition: all 0.5s ease-in-out;
         }
-    }
 
-    .clear {
-        background-color: transparent;
-        border-style: none;
-    }
+        .animation-wrapper {
+            display: grid;
+            overflow: hidden;
+            grid-template-rows: 0;
+            transition: grid-template-rows 0.5s ease-in-out;
+        }
 
-    .clear-children {
-        & :global(::slotted(ha-card)) {
+        .children-container {
+            padding: var(--child-padding);
+            display: grid;
+            gap: var(--gap);
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+
+            & > :global(:first-child) {
+                margin-top: var(--gap);
+            }
+        }
+
+        .clear {
+            background-color: transparent;
+            border-style: none;
+        }
+
+        .clear-children {
+            & :global(::slotted(ha-card)) {
+                background-color: transparent !important;
+                border-style: none !important;
+            }
+        }
+
+        :global(::slotted(ha-card)) {
             background-color: transparent !important;
             border-style: none !important;
         }
-    }
 
-    :global(::slotted(ha-card)) {
-        background-color: transparent !important;
-        border-style: none !important;
-    }
+        .title-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: row;
+        }
 
-    .title-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-direction: row;
-    }
+        .title-card-header-overlay {
+            display: block;
+            padding: var(--title-card-margin);
+        }
 
-    .title-card-header-overlay {
-        display: block;
-        padding: var(--title-card-margin);
-    }
+        .title-card-container {
+            width: 100%;
+            padding: var(--title-padding);
+        }
 
-    .title-card-container {
-        width: 100%;
-        padding: var(--title-padding);
-    }
+        ${dynamicStyle}
 
-    .header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 0.8em 0.8em;
-        margin: 2px;
-        background: var(--button-background);
-        border-style: none;
-    }
+        .header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0.8em 0.8em;
+            margin: 2px;
+            background: var(--button-background);
+            border-style: none;
+        }
 
-    .header-overlay {
-        position: absolute;
-        top: 0;
-        right: 0;
-        margin: var(--overlay-margin);
-    }
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: var(--overlay-margin);
+        }
 
-    .title {
-        width: 100%;
-        text-align: left;
-    }
+        .title {
+            width: 100%;
+            text-align: left;
+        }
 
-    .ico {
-        color: var(--primary-text-color);
-        transition-property: transform;
-        transition-duration: 0.35s;
-    }
+        .ico {
+            color: var(--primary-text-color);
+            transition-property: transform;
+            transition-duration: 0.35s;
+        }
 
-    .flipped {
-        transform: rotate(180deg);
-    }
+        .flipped {
+            transform: rotate(180deg);
+        }
 
-    .ripple {
-        background-position: center;
-        transition: background 0.8s;
-        border-radius: 1em;
-    }
+        .ripple {
+            background-position: center;
+            transition: background 0.8s;
+            border-radius: 1em;
+        }
 
-    .ripple:hover {
-        background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
-    }
+        .ripple:hover {
+            background: #ffffff12 radial-gradient(circle, transparent 1%, #ffffff12 1%) center/15000%;
+        }
 
-    .ripple:active {
-        background-color: #ffffff25;
-        background-size: 100%;
-        transition: background 0s;
-    }
-</style>
+        .ripple:active {
+            background-color: #ffffff25;
+            background-size: 100%;
+            transition: background 0s;
+        }
+    </style>
+<!--</svelte:head>-->

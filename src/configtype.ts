@@ -29,4 +29,5 @@ export interface ExpanderConfig {
     expanded?: boolean;
     'expand-id'?: string;
     'button-background': string;
+    'fontSizes': object;
 }
