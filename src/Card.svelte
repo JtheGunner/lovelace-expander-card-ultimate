@@ -122,209 +122,148 @@ limitations under the License.
 
             resolve(targetElements);
         });
+    }
 
-        async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
-            const parsedObjects: any = parseStyleString(styles);
-            const targets = Object.keys(parsedObjects);
-            const targetElements = await waitForElements(cardElement, targets, {});
+    async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
+        const parsedObjects: any = parseStyleString(styles);
+        const targets = Object.keys(parsedObjects);
+        const targetElements = await waitForElements(cardElement, targets, {});
 
-            console.log('parseStyleString', parsedObjects, targetElements);
-            console.log('targetElement', targetElements);
-            // console.log('style element vorhanden', targetElement?.querySelector('style'))
+        console.log('parseStyleString', parsedObjects, targetElements);
+        console.log('targetElement', targetElements);
+        // console.log('style element vorhanden', targetElement?.querySelector('style'))
 
-            if (targetElements === null) return;
+        if (targetElements === null) return;
 
-            for (const [targetName, element] of Object.entries(targetElements)) {
-                let cssRule = createCssRules(parsedObjects[targetName]);
+        for (const [targetName, element] of Object.entries(targetElements)) {
+            let cssRule = createCssRules(parsedObjects[targetName]);
 
-                if (cssRule) {
-                    element.prepend(createShadowStyle(cssRule));
-                }
+            if (cssRule) {
+                element.prepend(createShadowStyle(cssRule));
             }
         }
+    }
 
 
-        function createShadowStyle(style: string): HTMLStyleElement {
-            const shadowStyle = document.createElement('style');
-            shadowStyle.innerHTML = style;
-            return shadowStyle;
-        }
+    function createShadowStyle(style: string): HTMLStyleElement {
+        const shadowStyle = document.createElement('style');
+        shadowStyle.innerHTML = style;
+        return shadowStyle;
+    }
 
-        /**
-         * parse a separator based string to valid css config by their matching dom-targets
-         *
-         * Hierarchy of separators:
-         * 1. `;;` -> split the basic groups (domTarget + configs)
-         * 2. `:::` -> split domTargets from their configurations
-         * 3. `&&` -> split multiple selectors from the same domTarget
-         * 4. `||` -> split css-selectors from their style-configs
-         * 5. `,`  -> split multiple style declarations
-         * 6. `:`  -> split style key from value
-         *
-         * @param {string} inputString separator based string
-         * @returns {object} structured object to generate css
-         */
-        function parseStyleString(inputString: string): object {
-            const finalStructure: any = {};
+    /**
+     * parse a separator based string to valid css config by their matching dom-targets
+     *
+     * Hierarchy of separators:
+     * 1. `;;` -> split the basic groups (domTarget + configs)
+     * 2. `:::` -> split domTargets from their configurations
+     * 3. `&&` -> split multiple selectors from the same domTarget
+     * 4. `||` -> split css-selectors from their style-configs
+     * 5. `,`  -> split multiple style declarations
+     * 6. `:`  -> split style key from value
+     *
+     * @param {string} inputString separator based string
+     * @returns {object} structured object to generate css
+     */
+    function parseStyleString(inputString: string): object {
+        const finalStructure: any = {};
 
-            if (!inputString) {
-                return finalStructure;
-            }
-
-            const groups = inputString.split(';;');
-
-            for (const group of groups) {
-                if (!group) continue;
-
-                // 2. domTarget von der CSS-Konfiguration trennen
-                const [domTarget, cssConfig] = group.split(':::');
-                if (!domTarget || !cssConfig) continue;
-
-                // Initialisiere das Objekt für diesen domTarget, falls nicht vorhanden
-                finalStructure[domTarget] = finalStructure[domTarget] || {};
-
-                // 3. Mehrere Selektoren trennen
-                const selectorBlocks = cssConfig.split('&&');
-
-                for (const block of selectorBlocks) {
-                    if (!block) continue;
-
-                    // 4. Selektor von den Styles trennen
-                    const [selector, stylesString] = block.split('||');
-                    if (!selector || !stylesString) continue;
-
-                    // 5. & 6. Styles parsen
-                    const styles = stylesString
-                        .split(',')
-                        .map(stylePair => {
-                            if (!stylePair) return null;
-
-                            // Trennt Key und Value, auch wenn Value selbst ein ':' enthält
-                            const [key, ...valueParts] = stylePair.split(':');
-                            const value = valueParts.join(':');
-
-                            if (!key || value === undefined) return null;
-
-                            return {key: key.trim(), value: value.trim()};
-                        })
-                        .filter(Boolean); // remove potential null values
-
-                    if (styles.length > 0) {
-                        finalStructure[domTarget][selector.trim()] = styles;
-                    }
-                }
-            }
-
+        if (!inputString) {
             return finalStructure;
         }
 
-        function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
-            const errorMsg = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
-            <selector>=<style1>:<value1>|<style2>:<value2>`;
+        const groups = inputString.split(';;');
 
-            if (!stylesStr) return {};
+        for (const group of groups) {
+            if (!group) continue;
 
-            try {
-                return Object.fromEntries(
-                    stylesStr.split(';;').map((part) => {
-                        const [domElement, styleConfig] = part.trim().split(':::');
-                        if (!domElement || !styleConfig) throw new Error();
+            // 2. domTarget von der CSS-Konfiguration trennen
+            const [domTarget, cssConfig] = group.split(':::');
+            if (!domTarget || !cssConfig) continue;
 
-                        const [selector, style] = part.trim().split('||');
-                        if (!selector || !style) throw new Error();
+            // Initialisiere das Objekt für diesen domTarget, falls nicht vorhanden
+            finalStructure[domTarget] = finalStructure[domTarget] || {};
 
-                        const styleArray = styleConfig.split('|').map((stylePair) => {
-                            const [style, value] = stylePair.trim().split(':');
-                            if (!style || !value) throw new Error();
-                            return {style, value};
-                        });
+            // 3. Mehrere Selektoren trennen
+            const selectorBlocks = cssConfig.split('&&');
 
-                        return [domElement, styleArray];
+            for (const block of selectorBlocks) {
+                if (!block) continue;
+
+                // 4. Selektor von den Styles trennen
+                const [selector, stylesString] = block.split('||');
+                if (!selector || !stylesString) continue;
+
+                // 5. & 6. Styles parsen
+                const styles = stylesString
+                    .split(',')
+                    .map(stylePair => {
+                        if (!stylePair) return null;
+
+                        // Trennt Key und Value, auch wenn Value selbst ein ':' enthält
+                        const [key, ...valueParts] = stylePair.split(':');
+                        const value = valueParts.join(':');
+
+                        if (!key || value === undefined) return null;
+
+                        return {key: key.trim(), value: value.trim()};
                     })
-                );
-            } catch (e) {
-                console.warn(errorMsg, stylesStr);
-                return {};
+                    .filter(Boolean); // remove potential null values
+
+                if (styles.length > 0) {
+                    finalStructure[domTarget][selector.trim()] = styles;
+                }
             }
         }
 
-        function createCssRules(objects: Record<string, CssStyleObject[]>): string {
-            return Object.entries(objects).map(([selector, styles]) => `${selector} {
+        return finalStructure;
+    }
+
+    // function parseStylesFromStringToObject(stylesStr: string): Record<string, CssStyleObject[]> {
+    //     const errorMsg = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
+    //     <selector>=<style1>:<value1>|<style2>:<value2>`;
+    //
+    //     if (!stylesStr) return {};
+    //
+    //     try {
+    //         return Object.fromEntries(
+    //             stylesStr.split(';;').map((part) => {
+    //                 const [domElement, styleConfig] = part.trim().split(':::');
+    //                 if (!domElement || !styleConfig) throw new Error();
+    //
+    //                 const [selector, style] = part.trim().split('||');
+    //                 if (!selector || !style) throw new Error();
+    //
+    //                 const styleArray = styleConfig.split('|').map((stylePair) => {
+    //                     const [style, value] = stylePair.trim().split(':');
+    //                     if (!style || !value) throw new Error();
+    //                     return {style, value};
+    //                 });
+    //
+    //                 return [domElement, styleArray];
+    //             })
+    //         );
+    //     } catch (e) {
+    //         console.warn(errorMsg, stylesStr);
+    //         return {};
+    //     }
+    // }
+
+    function createCssRules(objects: Record<string, CssStyleObject[]>): string {
+        return Object.entries(objects).map(([selector, styles]) => `${selector} {
                 ${createCssStyles(styles)}
             }`)
-                .join('\n')
-                .trim();
-        }
+            .join('\n')
+            .trim();
+    }
 
-        function createCssStyles(stylesArray: CssStyleObject[]): string {
-            return stylesArray
-                .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
-                .join('\n')
-                .trim();
-        }
+    function createCssStyles(stylesArray: CssStyleObject[]): string {
+        return stylesArray
+            .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
+            .join('\n')
+            .trim();
+    }
 
-    // function parseStylesFromStringToObject(styles: string){
-    //     let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
-    //             <selector>=<style1>:<value1>|<style2>:<value2>`;
-    //
-    //     let generatedStyles: any = {};
-    //     let data = styles.split(',');
-    //
-    //     if (data.length === 0) {
-    //         console.warn(error, 'configSplit');
-    //         return generatedStyles;
-    //     }
-    //
-    //     data.forEach(function (item, index) {
-    //         let styleData = item.split(',');
-    //
-    //         styleData.forEach(function (styleConfig, index) {
-    //             let selectorSplit = styleConfig.split('=');
-    //
-    //             if (selectorSplit.length !== 2) {
-    //                 console.warn(error, 'selectorSplit', selectorSplit);
-    //                 return;
-    //             }
-    //
-    //             let selector = selectorSplit[0];
-    //             let stylesSplit = selectorSplit[1].split('|');
-    //
-    //             let generatedStyle: Array<object> = [];
-    //
-    //             stylesSplit.forEach(function (style, index) {
-    //                 let styleSplit = style.split(':');
-    //
-    //                 if (styleSplit.length !== 2) {
-    //                     console.warn(error, 'styleSplit', styleSplit);
-    //                     return;
-    //                 }
-    //
-    //                 generatedStyle.push({
-    //                     style: styleSplit[0],
-    //                     value: styleSplit[1],
-    //                 })
-    //             });
-    //
-    //             generatedStyles[selector] = generatedStyle
-    //         });
-    //     });
-    //
-    //     return generatedStyles;
-    // }
-
-    // function createCssRules(objects: object){
-    //     return Object.entries(objects).map(function ([selector, styles]) {
-    //         return `${selector} {
-    //             ${createCssStyles(styles)}
-    //         }`;
-    //     }).join("\n").trim();
-    // }
-    //
-    // function createCssStyles(stylesArray: Array<CssStyleObject>){
-    //     return stylesArray.map(function (styleObject: CssStyleObject) {
-    //         return `${styleObject.style}: ${styleObject.value};`;
-    //     }).join("\n").trim();
-    // }
 </script>
 
 <svelte:element this={type} bind:this={container} transition:slide|local/>
