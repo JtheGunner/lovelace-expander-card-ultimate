@@ -13,12 +13,14 @@ limitations under the License.
 import type { LovelaceCardConfig } from 'custom-card-helpers';
 
 export interface ExpanderConfig {
-    clear?: boolean;
+    'clear'?: boolean;
     'clear-children'?: boolean;
-    cards?: { type: string }[];
-    gap: string;
-    padding: string;
-    title: string;
+    'cards'?: { type: string }[];
+    'gap': string;
+    'padding': string;
+    'title': string;
+    'title-card-style-target': string;
+    'title-card-font-sizes': {};
     'title-card-margin'?: string;
     'title-card-background'?: string;
     'title-card'?: LovelaceCardConfig;
@@ -26,8 +28,7 @@ export interface ExpanderConfig {
     'title-card-button-overlay'?: false;
     'overlay-margin'?: string;
     'child-padding'?: string;
-    expanded?: boolean;
+    'expanded'?: boolean;
     'expand-id'?: string;
     'button-background': string;
-    'fontSizes': {};
 }

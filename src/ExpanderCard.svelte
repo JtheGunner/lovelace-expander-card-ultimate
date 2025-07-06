@@ -8,14 +8,15 @@
         'clear': false,
         'clear-children': false,
         'title': 'Expander',
+        'title-card-style-target': '',
+        'title-card-font-sizes': {
+            'h2': '16em'
+        },
         'title-card-margin': '0',
         'title-card-background': 'var(--card-background-color, #fff)',
         'overlay-margin': '2em',
         'child-padding': '0.5em',
-        'button-background': 'transparent',
-        'fontSizes': {
-            'h2': '16em'
-        }
+        'button-background': 'transparent'
     };
 </script>
 
@@ -62,8 +63,13 @@
 
     let isEditorMode = $state(false);
 
-    let dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes).map(function ([selector, size]) {
-        return `
+    // add fields used in customClass as props.
+    const {
+        hass,
+        self,
+        config = defaults,
+        dynamicStyle = Object.entries(defaults['title-card-font-sizes']).map(function ([selector, size]) {
+            return `
             :global(${selector}) {
                 font-size: ${size} !important;
             }
@@ -72,16 +78,7 @@
                 font-size: ${size} !important;
             }
             `;
-    }).join(''));
-
-    console.log('dynamicStyleTmp111', dynamicStyleTmp);
-
-    // add fields used in customClass as props.
-    const {
-        hass,
-        self,
-        config = defaults,
-        dynamicStyle = dynamicStyleTmp
+        }).join('')
     }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
 
     onMount(() => {
@@ -114,10 +111,13 @@
         <div class={`title-card-header${config['title-card-button-overlay'] ? '-overlay' : ''}`}>
             <div class="title-card-container" style="--title-padding:{config['title-card-padding']}; --ha-card-background:{config['title-card-background']};">
                 <Card
-                        hass={hass}
-                        config={config['title-card']}
-                        type={config['title-card'].type}
-                        clearChild={config['clear-children'] || false}/>
+                    hass={hass}
+                    config={config['title-card']}
+                    type={config['title-card'].type}
+                    clearChild={config['clear-children'] || false}
+                    isTitleCard={true}
+                    styleTarget={config['title-card-style-target']}
+                    styles={config['title-card-font-sizes']} />
             </div>
             <button
                     aria-label="Toggle"

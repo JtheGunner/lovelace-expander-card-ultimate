@@ -25,11 +25,20 @@ limitations under the License.
         type = 'div',
         config,
         hass,
-        clearChild = false
-    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean } = $props();
+        clearChild = false,
+        isTitleCard = false,
+        styleTarget = '',
+        styles = {},
+    }: { type: string; config: LovelaceCardConfig; hass: HomeAssistant; clearChild: boolean; isTitleCard: boolean; styleTarget: string; styles: {} } = $props();
 
     let container = $state<LovelaceCard>();
     let loading = $state(true);
+
+    function createShadowStyle($style: string){
+        const shadowStyle = document.createElement('style');
+        shadowStyle.innerHTML = $style;
+        return shadowStyle;
+    }
 
     $effect(() => {
         if (container) {
@@ -49,17 +58,48 @@ limitations under the License.
         container.replaceWith(el);
         container = el;
         if (clearChild) {
-            const shadowStyle = document.createElement('style');
-            shadowStyle.innerHTML = `
+            console.log(el);
+            el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
                     background-color: transparent !important;
                     border-style: none !important;
                 }
-            `;
-            console.log(el);
-            el.shadowRoot?.appendChild(shadowStyle);
+            `));
         }
         loading = false;
+
+        if(isTitleCard && styleTarget !== '' && Object.keys(styles).length > 0){
+            let maxLoops = 20;
+            let obj: any = el;
+
+            while(maxLoops > 0){
+                console.log(obj);
+                if(obj.querySelector(styleTarget)){
+                    obj.appendChild(createShadowStyle(Object.entries(styles).map(function ([selector, size]) {
+                        return `
+                            :global(${selector}) {
+                                font-size: ${size} !important;
+                            }
+
+                            & :global(${selector}) {
+                                font-size: ${size} !important;
+                            }
+                            `;
+                    }).join('')));
+                    break;
+                }
+
+                let nextObject: any =  obj.shadowRoot !== undefined ? obj.shadowRoot : (obj.firstElementChild !== undefined ? obj.firstElementChild : null);
+
+                if(nextObject === null){
+                    console.log('no valid child found to append styling');
+                    break;
+                }
+
+                obj = nextObject;
+                maxLoops--;
+            }
+        }
     });
 </script>
 
