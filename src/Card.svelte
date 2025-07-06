@@ -63,7 +63,7 @@ limitations under the License.
 
         }
 
-        await tick().then(async function(){
+        await tick().then(async function () {
             el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
                     background-color: transparent !important;
@@ -71,19 +71,21 @@ limitations under the License.
                 }
             `));
 
+            setTimeout(async () => {
+                let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
 
-            let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
+                if (isTitleCard && styles) {
+                    let element = el;
 
-            if (isTitleCard && styles) {
-                let element = el;
+                    console.log('element', element);
+                    console.log(customStyles);
+                    console.log(defaultStyles);
+                    console.log(styles);
 
-                console.log('element', element);
-                console.log(customStyles);
-                console.log(defaultStyles);
-                console.log(styles);
+                    await applyTitleCardStyles(element, styles);
+                }
 
-                await applyTitleCardStyles(element, styles);
-            }
+            }, 2000);
 
             loading = false;
         });
@@ -128,7 +130,7 @@ limitations under the License.
             console.log('element.shadowRoot', element.shadowRoot);
 
             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-                console.log('nextObject', nextObject);
+            console.log('nextObject', nextObject);
 
             if (targetNames.length > 0 && nextObject !== null) {
                 targetElements = await waitForElements(nextObject, targetNames, targetElements)
