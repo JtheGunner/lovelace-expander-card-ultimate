@@ -68,6 +68,8 @@ limitations under the License.
         }
         loading = false;
 
+        console.log('isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+
         if(isTitleCard && styleTarget !== '' && Object.keys(styles).length > 0){
             let maxLoops = 20;
             let obj: any = el;
