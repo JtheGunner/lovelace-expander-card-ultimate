@@ -51,14 +51,15 @@ limitations under the License.
         const util = await getCardUtil();
         const el = util.createCardElement(config);
         el.hass = hass;
+
         if (!container) {
             console.error('container doesn\'t exist');
             return;
         }
+
         container.replaceWith(el);
         container = el;
         if (clearChild) {
-            console.log(el);
             el.shadowRoot?.appendChild(createShadowStyle(`
                 ha-card {
                     background-color: transparent !important;
@@ -99,10 +100,6 @@ limitations under the License.
                 styleObj[stylePair[0]] = stylePair[1];
             });
 
-            console.log(styleObj);
-
-
-
             setTimeout(() => {
                 let maxLoops = 20;
 
@@ -110,7 +107,7 @@ limitations under the License.
                     console.log(element);
                     if (element.querySelector(styleTarget)) {
                         console.log('MATCH', element);
-                        element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
+                        element.prepend(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
                             return `
                             :global(${selector}) {
                                 font-size: ${size} !important;
