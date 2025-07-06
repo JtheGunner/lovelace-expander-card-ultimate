@@ -106,6 +106,7 @@ limitations under the License.
             while (maxLoops > 0) {
                 console.log(element);
                 if (element.querySelector(styleTarget)) {
+                    console.log('MATCH', element);
                     element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
                         return `
                             :global(${selector}) {
@@ -119,6 +120,8 @@ limitations under the License.
                     }).join('')));
                     break;
                 }
+
+                console.log(element, element.firstElementChild, element.shadowRoot);
 
                 let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
 
