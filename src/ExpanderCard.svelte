@@ -169,7 +169,7 @@
     {/if}
 </ha-card>
 
-<!--<svelte:head>-->
+<svelte:head>
     <style>
         .expander-card-ultimate {
             display: grid;
@@ -281,4 +281,4 @@
             transition: background 0s;
         }
     </style>
-<!--</svelte:head>-->
+</svelte:head>
