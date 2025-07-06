@@ -69,51 +69,32 @@ limitations under the License.
         }
         loading = false;
 
-        if(isTitleCard && styleTarget !== ''){
+        if(isTitleCard && styleTarget !== '' && styles !== ''){
 
             console.log(container, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
 
-            if(styles === ''){
-                return;
-            }
 
-            let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
-            let element: any = container;
-            let styleObj: any = {};
-            let data = styles.split(',');
-
-            if(data.length === 0){
-                console.warn(error);
-                return;
-            }
-
-            data.forEach(function(item, index){
-                let stylePair = item.split(':');
-
-                if(stylePair.length !== 2){
-                    console.warn(error, {
-                        value: item
-                    });
-                    return;
-                }
-
-                styleObj[stylePair[0]] = stylePair[1];
-            });
+            let stylesArray = parseStylesFromStringToArray(styles);
+            console.log(stylesArray);
 
             setTimeout(() => {
+                let element: any = container;
                 let maxLoops = 20;
 
                 while (maxLoops > 0) {
                     console.log(element);
                     if (element.querySelector(styleTarget)) {
                         console.log('MATCH', element);
-                        element.prepend(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
-                            return `
-                            ${selector} {
-                                font-size: ${size} !important;
-                            }
-                            `;
-                        }).join('')));
+                        // element.prepend(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
+                        //     return `
+                        //     ${selector} {
+                        //         padding: 0;
+                        //         margin: 0;
+                        //         font-weight: 300 !important;
+                        //         font-size: ${size} !important;
+                        //     }
+                        //     `;
+                        // }).join('')));
                         break;
                     }
 
@@ -135,6 +116,56 @@ limitations under the License.
 
         }
     });
+
+    function parseStylesFromStringToArray(styles: string){
+        let error = `no valid styles for the title-card detected. use the following pattern (multiple entries, by comma-separation possible):
+                <selector>=<style1>:<value1>|<style2>:<value2>`;
+
+        let generatedStyles: Array<object> = [];
+        let data = styles.split(',');
+
+        if (data.length === 0) {
+            console.warn(error, 'configSplit');
+            return generatedStyles;
+        }
+
+        data.forEach(function (item, index) {
+            let styleData = item.split(',');
+
+            styleData.forEach(function (styleConfig, index) {
+                let selectorSplit = styleConfig.split('=');
+
+                if (selectorSplit.length !== 2) {
+                    console.warn(error, 'selectorSplit', selectorSplit);
+                    return;
+                }
+
+                let selector = selectorSplit[0];
+                let stylesSplit = selectorSplit[1].split('|');
+
+                let generatedStyle: any = {};
+                generatedStyle[selector] = [];
+
+                stylesSplit.forEach(function (style, index) {
+                    let styleSplit = style.split(':');
+
+                    if (styleSplit.length !== 2) {
+                        console.warn(error, 'styleSplit', styleSplit);
+                        return;
+                    }
+
+                    generatedStyle[selector].push({
+                        style: styleSplit[0],
+                        value: styleSplit[1],
+                    })
+                });
+
+                generatedStyles.push(generatedStyle[selector])
+            });
+        });
+
+        return generatedStyles;
+    }
 </script>
 
 <svelte:element this={type} bind:this={container} transition:slide|local />
