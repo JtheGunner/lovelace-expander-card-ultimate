@@ -101,14 +101,17 @@ limitations under the License.
 
             console.log(styleObj);
 
-            let maxLoops = 20;
 
-            while (maxLoops > 0) {
-                console.log(element);
-                if (element.querySelector(styleTarget)) {
-                    console.log('MATCH', element);
-                    element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
-                        return `
+
+            setTimeout(() => {
+                let maxLoops = 20;
+
+                while (maxLoops > 0) {
+                    console.log(element);
+                    if (element.querySelector(styleTarget)) {
+                        console.log('MATCH', element);
+                        element.appendChild(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
+                            return `
                             :global(${selector}) {
                                 font-size: ${size} !important;
                             }
@@ -117,24 +120,26 @@ limitations under the License.
                                 font-size: ${size} !important;
                             }
                             `;
-                    }).join('')));
-                    break;
+                        }).join('')));
+                        break;
+                    }
+
+                    console.log(element, element.firstElementChild, element.shadowRoot);
+
+                    let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+
+                    console.log('nextObject', nextObject);
+
+                    if (nextObject === null) {
+                        console.log('no valid child found to append styling');
+                        break;
+                    }
+
+                    element = nextObject;
+                    maxLoops--;
                 }
+            }, 2000);
 
-                console.log(element, element.firstElementChild, element.shadowRoot);
-
-                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-
-                console.log('nextObject', nextObject);
-
-                if (nextObject === null) {
-                    console.log('no valid child found to append styling');
-                    break;
-                }
-
-                element = nextObject;
-                maxLoops--;
-            }
         }
     });
 </script>
