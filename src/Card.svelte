@@ -70,7 +70,7 @@ limitations under the License.
 
         await tick().then(async function () {
             setTimeout(async () => {
-                let styles = trimPipe(trimPipe(customStyles) + ';;' + trimPipe(defaultStyles));
+                let styles = trimPipe(trimPipe(defaultStyles) + ';;' + trimPipe(customStyles));
 
                 if (isTitleCard && styles) {
                     await applyTitleCardStyles(el, styles);
