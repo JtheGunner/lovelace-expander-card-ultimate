@@ -65,7 +65,7 @@
 
     let dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes).map(function ([selector, size]) {
         return `
-            & :global(${selector}) {
+            :global(${selector}) {
                 font-size: ${size} !important;
             }
             `;
@@ -82,15 +82,6 @@
     }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
 
     onMount(() => {
-        let dynamicStyleTmp = Object.entries(defaults.fontSizes).map(function ([selector, size]) {
-            return `
-            .title-card-container :global(${selector}) {
-                font-size: ${size} !important;
-            }
-            `;
-        }).join('');
-
-        console.log('dynamicStyleTmp', dynamicStyleTmp);
         isEditorMode = (self)?.parentElement?.hasAttribute('preview') || false;
         if (isEditorMode) {
             expanded = true;
