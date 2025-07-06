@@ -11,6 +11,8 @@ jobs:
   gh_tagged_release:
     name: Create tagged release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout

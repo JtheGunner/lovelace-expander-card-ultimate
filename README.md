@@ -40,23 +40,23 @@ Clear Background (default theme):
 
 Yaml:
 
-| Name                      | Type     | Default       | Supported options      | Description                                                    |
-| ------------------------- | -------- | ------------- | ---------------------- | -------------------------------------------------------------- |
-| type                      | string   | **Required**  | `custom:expander-card` | Type of the card.                                              |
-| title                     | string   | _Expander_    | *                      | Title (Not displayed if using Title-Card)                      |
-| clear                     | boolean  | _false_       | true\|false            | Remove Background                                              |
-| clear-children            | boolean  | _false_       | true\|false            | Remove Backgrounds/Borders of child cards                      |
-| expanded                  | boolean  | _false_       | true\|false            | Start expanded                                                 |
-| expand-id                 | string   | **optional**  | string                 | Unique ID to use for JS LocalStorage. Will save expanded state |
-| button-background         | string   | _transparent_ | css-color              | Background color of expand button                              |
-| gap                       | string   | _0.6em_       | css-size               | gap between child cards                                        |
-| padding                   | string   | _1em_         | css-size               | padding of all card content                                    |
-| child-padding             | string   | _0.5em_       | css-size               | padding of child cards                                         |
-| title-card                | object   | **optional**  | LovelaceCardConfig     | Replace Title with card                                        |
-| title-card-padding        | string   | _0px_         | css-size               | padding of title-card                                          |
-| title-card-button-overlay | boolean  | _false_       | true\|false            | Overlay expand button over title-card                          |
-| overlay-margin            | string   | _2em_         | css-size               | Margin from top right of expander button (if overlay)          |
-| cards                     | object[] | **optional**  | LovelaceCardConfig[]   | Child cards to show when expanded                              |
+| Name                      | Type     | Default       | Supported options               | Description                                                    |
+| ------------------------- | -------- | ------------- |---------------------------------| -------------------------------------------------------------- |
+| type                      | string   | **Required**  | `custom:expander-card-ultimate` | Type of the card.                                              |
+| title                     | string   | _Expander_    | *                               | Title (Not displayed if using Title-Card)                      |
+| clear                     | boolean  | _false_       | true\|false                     | Remove Background                                              |
+| clear-children            | boolean  | _false_       | true\|false                     | Remove Backgrounds/Borders of child cards                      |
+| expanded                  | boolean  | _false_       | true\|false                     | Start expanded                                                 |
+| expand-id                 | string   | **optional**  | string                          | Unique ID to use for JS LocalStorage. Will save expanded state |
+| button-background         | string   | _transparent_ | css-color                       | Background color of expand button                              |
+| gap                       | string   | _0.6em_       | css-size                        | gap between child cards                                        |
+| padding                   | string   | _1em_         | css-size                        | padding of all card content                                    |
+| child-padding             | string   | _0.5em_       | css-size                        | padding of child cards                                         |
+| title-card                | object   | **optional**  | LovelaceCardConfig              | Replace Title with card                                        |
+| title-card-padding        | string   | _0px_         | css-size                        | padding of title-card                                          |
+| title-card-button-overlay | boolean  | _false_       | true\|false                     | Overlay expand button over title-card                          |
+| overlay-margin            | string   | _2em_         | css-size                        | Margin from top right of expander button (if overlay)          |
+| cards                     | object[] | **optional**  | LovelaceCardConfig[]            | Child cards to show when expanded                              |
 
 ## Installation
 
@@ -68,29 +68,29 @@ Click on the button below to add this repository to your HACS sources and open t
 
 Alternatively, you can add it manually by following the [documentation here](https://hacs.xyz/docs/faq/custom_repositories/).
 
-The link to the repository is https://github.com/Alia5/lovelace-expander-card
+The link to the repository is https://github.com/JtheGunner/lovelace-expander-card-ultimate#
 
 ### Manual install
 #### 1. Download the card
 
-Install the `expander-card` card by copying `lovelace-expander-card.js` to `<config directory>/www/lovelace-expander-card.js`
+Install the `expander-card-ultimate` card by copying `lovelace-expander-card-ultimate.js` to `<config directory>/www/lovelace-expander-card-ultimate.js`
 
 Bash:
 
 ```bash
-wget https://github.com/Alia5/lovelace-expander-card/releases/download/latest/lovelace-expander-card.js
-mv lovelace-expander-card.js /config/www/
+wget https://github.com/JtheGunner/lovelace-expander-card-ultimate/releases/download/latest/lovelace-expander-card.js
+mv lovelace-expander-card-ultimate.js /config/www/
 ```
 
 #### 2. Link the card to your lovelace ui
 
 ##### The manual way:
 
-Link `expander-card` inside your `ui-lovelace.yaml`
+Link `expander-card-ultimate` inside your `ui-lovelace.yaml`
 
 ```yaml
 resources:
-  - url: /local/lovelace-expander-card.js
+  - url: /local/lovelace-expander-card-ultimate.js
     type: js
 ```
 
