@@ -68,7 +68,39 @@ limitations under the License.
         }
         loading = false;
 
-        function addStyles(element: any, styleObj: any, styleTarget: any) {
+        if(isTitleCard && styleTarget !== ''){
+
+            console.log(el, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
+
+            if(styles === ''){
+                return;
+            }
+
+            let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
+            let element: any = el;
+            let styleObj: any = {};
+            let data = styles.split(',');
+
+            if(data.length === 0){
+                console.warn(error);
+                return;
+            }
+
+            data.forEach(function(item, index){
+                let stylePair = item.split(':');
+
+                if(stylePair.length !== 2){
+                    console.warn(error, {
+                        value: item
+                    });
+                    return;
+                }
+
+                styleObj[stylePair[0]] = stylePair[1];
+            });
+
+            console.log(styleObj);
+
             let maxLoops = 20;
 
             while (maxLoops > 0) {
@@ -100,45 +132,6 @@ limitations under the License.
                 element = nextObject;
                 maxLoops--;
             }
-        }
-
-        if(isTitleCard && styleTarget !== ''){
-
-            console.log(el, 'isTitleCard', isTitleCard, 'styleTarget', styleTarget, 'styles', styles);
-
-            if(styles === ''){
-                return;
-            }
-
-            let error = 'no valid styles for the title-card detected. use the following pattern: <selector1>:<style1>,<selector2>:<style2>';
-            let maxLoops = 20;
-            let element: any = el;
-            let styleObj: any = {};
-            let data = styles.split(',');
-
-            if(data.length === 0){
-                console.warn(error);
-                return;
-            }
-
-            data.forEach(function(item, index){
-                let stylePair = item.split(':');
-
-                if(stylePair.length !== 2){
-                    console.warn(error, {
-                        value: item
-                    });
-                    return;
-                }
-
-                styleObj[stylePair[0]] = stylePair[1];
-            });
-
-            console.log(styleObj);
-
-
-
-            addStyles(maxLoops, element, styleObj);
         }
     });
 </script>
