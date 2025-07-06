@@ -43,42 +43,49 @@ limitations under the License.
         if (container) {
             container.hass = hass;
         }
-
-        if (isTitleCard && styleTarget !== '' && styles !== '') {
-            let stylesArray = parseStylesFromStringToObject(styles);
-            console.log(stylesArray);
-
-            // setTimeout(() => {
-            let element: any = container;
-            let maxLoops = 20;
-
-            while (maxLoops > 0) {
-                console.log(element);
-                if (element.querySelector(styleTarget)) {
-                    console.log('MATCH', element);
-                    console.log(createCssRules(stylesArray));
-                    element.prepend(createShadowStyle(createCssRules(stylesArray)));
-                    break;
-                }
-
-                let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
-                console.log('nextObject', nextObject);
-
-                if (nextObject === null) {
-                    console.log('no valid child found to append styles');
-                    break;
-                }
-
-                element = nextObject;
-                maxLoops--;
-            }
-            // }, 100);
-
-        }
     });
 
+
+    // $effect(() => {
+    //     if (container) {
+    //         container.hass = hass;
+    //     }
+    //
+    //     if (isTitleCard && styleTarget !== '' && styles !== '') {
+    //         let stylesArray = parseStylesFromStringToObject(styles);
+    //         console.log(stylesArray);
+    //
+    //         // setTimeout(() => {
+    //         let element: any = container;
+    //         let maxLoops = 20;
+    //
+    //         while (maxLoops > 0) {
+    //             console.log(element);
+    //             if (element.querySelector(styleTarget)) {
+    //                 console.log('MATCH', element);
+    //                 console.log(createCssRules(stylesArray));
+    //                 element.prepend(createShadowStyle(createCssRules(stylesArray)));
+    //                 break;
+    //             }
+    //
+    //             let nextObject: any = element.firstElementChild !== undefined && element.firstElementChild !== null ? element.firstElementChild : (element.shadowRoot !== undefined ? element.shadowRoot : null);
+    //             console.log('nextObject', nextObject);
+    //
+    //             if (nextObject === null) {
+    //                 console.log('no valid child found to append styles');
+    //                 break;
+    //             }
+    //
+    //             element = nextObject;
+    //             maxLoops--;
+    //         }
+    //         // }, 100);
+    //
+    //     }
+    // });
+
     onMount(async () => {
-        console.log('ExpanderSubCard onMount');
+        console.log('SUB-CARD MOUNTED:', new Date().toLocaleTimeString());
         const util = await getCardUtil();
         const el = util.createCardElement(config);
         el.hass = hass;
@@ -100,11 +107,14 @@ limitations under the License.
         }
 
         if (isTitleCard && styleTarget && styles) {
-            let element = el;
-            await applyTitleCardStyles(element, styleTarget, styles);
+            await applyTitleCardStyles(el, styleTarget, styles);
         }
 
         loading = false;
+    });
+
+    onDestroy(() => {
+        console.log('SUB-CARD DESTROYED:', new Date().toLocaleTimeString());
     });
 
     /**
@@ -151,9 +161,10 @@ limitations under the License.
 
     async function applyTitleCardStyles(cardElement: LovelaceCard, targetSelector: string, stylesString: string) {
         const targetElement = await waitForElement(cardElement, targetSelector);
-        if (targetElement) {
-            const stylesObject = parseStylesFromStringToObject(stylesString);
-            const cssRules = createCssRules(stylesObject);
+
+        if (targetElement && targetElement.querySelector('style') === null) {
+            const cssRules = createCssRules(parseStylesFromStringToObject(stylesString));
+
             if (cssRules) {
                 targetElement.prepend(createShadowStyle(cssRules));
             }
