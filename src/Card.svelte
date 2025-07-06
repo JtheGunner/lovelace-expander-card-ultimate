@@ -18,7 +18,7 @@ limitations under the License.
 <script lang="ts">
     import type { LovelaceCard, HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';
     import { getCardUtil } from './cardUtil.svelte';
-    import { onMount } from 'svelte';
+    import {afterUpdate, onMount} from 'svelte';
     import { slide } from 'svelte/transition';
 
     type CssStyleObject = {
@@ -73,12 +73,14 @@ limitations under the License.
             `));
         }
         loading = false;
+    });
 
+    $effect(() => {
         if(isTitleCard && styleTarget !== '' && styles !== ''){
             let stylesArray = parseStylesFromStringToObject(styles);
             console.log(stylesArray);
 
-            setTimeout(() => {
+            // setTimeout(() => {
                 let element: any = container;
                 let maxLoops = 20;
 
@@ -102,7 +104,7 @@ limitations under the License.
                     element = nextObject;
                     maxLoops--;
                 }
-            }, 100);
+            // }, 100);
 
         }
     });
