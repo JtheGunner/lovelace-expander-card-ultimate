@@ -22,7 +22,7 @@ limitations under the License.
     import {slide} from 'svelte/transition';
 
     type CssStyleObject = {
-        style: string;
+        key: string;
         value: string;
     };
 
@@ -275,7 +275,7 @@ limitations under the License.
 
     function createCssStyles(stylesArray: CssStyleObject[]): string {
         return stylesArray
-            .map((styleObject) => `${styleObject.style}: ${styleObject.value};`)
+            .map((styleObject) => `${styleObject.key}: ${styleObject.value};`)
             .join('\n')
             .trim();
     }
