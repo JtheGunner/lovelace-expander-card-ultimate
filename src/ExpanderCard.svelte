@@ -61,19 +61,26 @@
 
     let isEditorMode = $state(false);
 
-    const dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes)
-        .map(([selector, size]) => `
-        .title-card-container :global(${selector}) {
-            font-size: ${size} !important;
-        }
-    `).join(''));
+    let dynamicStyleTmp = $derived(Object.entries(defaults.fontSizes).map(function ([selector, size]) {
+        return `
+            .title-card-container :global(${selector}) {
+                font-size: ${size} !important;
+            }
+            `;
+    }).join(''));
 
     // add fields used in customClass as props.
     const {
         hass,
         self,
         config = defaults,
-        dynamicStyle = dynamicStyleTmp
+        dynamicStyle = Object.entries(defaults.fontSizes).map(function ([selector, size]) {
+            return `
+            .title-card-container :global(${selector}) {
+                font-size: ${size} !important;
+            }
+            `;
+        }).join('')
     }: { hass: HomeAssistant; config: ExpanderConfig; self: HTMLElement; dynamicStyle: string } = $props();
 
     onMount(() => {
@@ -169,8 +176,7 @@
     {/if}
 </ha-card>
 
-<svelte:head>
-    <style>
+{@html `<style>
         .expander-card-ultimate {
             display: grid;
             padding: var(--padding);
@@ -280,5 +286,5 @@
             background-size: 100%;
             transition: background 0s;
         }
-    </style>
-</svelte:head>
+    </style>`
+}
