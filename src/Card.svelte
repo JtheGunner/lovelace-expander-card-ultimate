@@ -109,11 +109,7 @@ limitations under the License.
                         console.log('MATCH', element);
                         element.prepend(createShadowStyle(Object.entries(styleObj).map(function ([selector, size]) {
                             return `
-                            :global(${selector}) {
-                                font-size: ${size} !important;
-                            }
-
-                            & :global(${selector}) {
+                            ${selector} {
                                 font-size: ${size} !important;
                             }
                             `;
