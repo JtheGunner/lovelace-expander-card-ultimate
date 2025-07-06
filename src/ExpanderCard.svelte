@@ -105,35 +105,6 @@
     });
 </script>
 
-<svelte:head>
-    {@html `<style>
-        .title-card-header-overlay {
-            display: block;
-            padding: var(--title-card-margin);
-
-            & :global(h2) {
-                padding: 0;
-                margin: 0;
-                font-weight: 300 !important;
-              }
-            & :global(p) {
-                padding: 0;
-                margin: 0;
-              }
-
-              ${dynamicStyle}
-        }
-
-        .title-card-container {
-            width: 100%;
-            padding: var(--title-padding);
-
-            ${dynamicStyle}
-        }
-    </style>`
-    }
-</svelte:head>
-
 
 <ha-card
         class={`expander-card-ultimate ${config.clear ? 'clear' : ''}`}

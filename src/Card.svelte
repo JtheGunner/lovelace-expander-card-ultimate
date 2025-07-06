@@ -56,6 +56,7 @@ limitations under the License.
                     border-style: none !important;
                 }
             `;
+            console.log(el);
             el.shadowRoot?.appendChild(shadowStyle);
         }
         loading = false;
