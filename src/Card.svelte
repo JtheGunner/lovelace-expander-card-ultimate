@@ -137,7 +137,7 @@ limitations under the License.
 
     async function applyTitleCardStyles(cardElement: LovelaceCard, styles: string) {
         const parsedObjects = parseStyleString(styles);
-        console.log('parseStyleString', parseStyleString);
+        console.log('parseStyleString', parsedObjects);
         return;
         const targetElement = await waitForElement(cardElement, targetSelector);
         console.log('targetElement', targetElement);
